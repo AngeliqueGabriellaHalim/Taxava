@@ -1,6 +1,8 @@
 import React, { useState } from "react";
 import type { FormEvent } from "react";
+import toast from "react-hot-toast";
 import users from "../mock/users.json";
+import { Mail } from "lucide-react";
 
 interface User {
   id: number;
@@ -9,9 +11,6 @@ interface User {
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState("");
-  const [status, setStatus] = useState<"idle" | "success" | "not-found">(
-    "idle"
-  );
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
@@ -21,10 +20,14 @@ const ForgotPassword: React.FC = () => {
     );
 
     if (found) {
-      setStatus("success");
+      toast.success(
+        `If an account exists for ${email}, we've sent a reset link.`
+      );
     } else {
-      setStatus("not-found");
+      toast.error(`We can't find an account with ${email}.`);
     }
+
+    setEmail("");
   };
 
   return (
@@ -40,54 +43,33 @@ const ForgotPassword: React.FC = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <p className="text-sm text-neutral-200 text-center leading-relaxed">
-            Enter the email associated with
-            <br />
-            your account.
+            Enter the email associated with your account.
           </p>
 
           <div className="flex items-center bg-neutral-700 rounded-full px-4 h-12">
-            <span className="mr-2 text-lg">✉️</span>
+            <Mail className="mr-2 w-5 h-5 text-neutral-400" />
             <input
               type="email"
               required
               placeholder="Enter your email address"
               value={email}
-              onChange={(e) => {
-                setEmail(e.target.value);
-                setStatus("idle");
-              }}
+              onChange={(e) => setEmail(e.target.value)}
               className="flex-1 bg-transparent outline-none text-sm placeholder:text-neutral-400"
             />
           </div>
 
           <p className="text-xs text-neutral-300 text-center leading-relaxed">
-            We&apos;ll send an email with instructions
-            <br />
-            to <span className="font-semibold">reset your password.</span>
+            We'll send an email with instructions to{" "}
+            <span className="font-semibold">reset your password.</span>
           </p>
 
           <button
             type="submit"
-            className="w-full h-12 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg active:translate-y-[1px] hover:opacity-95 transition"
+            className="w-full h-12 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg active:translate-y-[1px] hover:opacity-95 transition cursor-pointer"
           >
             Send Email
           </button>
         </form>
-
-        {status === "success" && (
-          <p className="mt-4 text-xs text-emerald-400 text-center">
-            If an account exists for{" "}
-            <span className="font-semibold">{email}</span>, we&apos;ve sent a
-            reset link.
-          </p>
-        )}
-
-        {status === "not-found" && (
-          <p className="mt-4 text-xs text-red-400 text-center">
-            We can&apos;t find an account with{" "}
-            <span className="font-semibold">{email}</span>.
-          </p>
-        )}
       </div>
     </div>
   );
