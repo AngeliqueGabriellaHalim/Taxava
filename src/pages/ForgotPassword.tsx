@@ -47,7 +47,7 @@ const ForgotPassword: React.FC = () => {
           </p>
 
           <div className="flex items-center bg-neutral-700 rounded-full px-4 h-12">
-            <Mail className="mr-2 w-5 h-5 text-neutral-400" />
+            <Mail className="mr-2 w-5 h-5 text-neutral-200" />
             <input
               type="email"
               required
