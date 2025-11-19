@@ -37,7 +37,7 @@ const CreateAccount: React.FC = () => {
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-
+    navigate("/login");
     const found = (users as User[]).some(
       (user) => user.email.toLowerCase() === form.email.toLowerCase()
     );
@@ -54,7 +54,7 @@ const CreateAccount: React.FC = () => {
 
     toast.success(`Account created successfully for ${form.username}!`);
 
-    navigate("/checkemail");
+    navigate("/login");
 
     setForm({
       username: "",
