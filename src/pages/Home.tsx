@@ -16,6 +16,12 @@ const Home: React.FC = () => {
         <li>
           <Link to={"/checkemail"}>CheckEmail</Link>
         </li>
+        <li>
+          <Link to={"/login-email"}>LoginPageEmail</Link>
+        </li>
+        <li>
+          <Link to={"/login-username"}>LoginPageUsername</Link>
+        </li>
       </ul>
     </div>
   );
