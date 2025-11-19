@@ -1,34 +1,10 @@
 import React, { useState } from "react";
-import type { FormEvent } from "react";
-import toast from "react-hot-toast";
-import users from "../mock/users.json";
 import { Mail } from "lucide-react";
-
-interface User {
-  id: number;
-  email: string;
-}
+import { useNavigate } from "react-router-dom";
 
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState("");
-
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-
-    const found = (users as User[]).some(
-      (user) => user.email.toLowerCase() === email.toLowerCase()
-    );
-
-    if (found) {
-      toast.success(
-        `If an account exists for ${email}, we've sent a reset link.`
-      );
-    } else {
-      toast.error(`We can't find an account with ${email}.`);
-    }
-
-    setEmail("");
-  };
+  const navigate = useNavigate();
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white flex items-center justify-center px-6 relative">
@@ -41,7 +17,7 @@ const ForgotPassword: React.FC = () => {
       <div className="bg-neutral-800/90 rounded-2xl shadow-2xl px-10 py-10 max-w-md w-full">
         <h1 className="text-3xl font-bold mb-6 text-center">Forgot Password</h1>
 
-        <form onSubmit={handleSubmit} className="space-y-6">
+        <form className="space-y-6">
           <p className="text-sm text-neutral-200 text-center leading-relaxed">
             Enter the email associated with your account.
           </p>
@@ -50,7 +26,6 @@ const ForgotPassword: React.FC = () => {
             <Mail className="mr-2 w-5 h-5 text-neutral-200" />
             <input
               type="email"
-              required
               placeholder="Enter your email address"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -64,7 +39,8 @@ const ForgotPassword: React.FC = () => {
           </p>
 
           <button
-            type="submit"
+            type="button"
+            onClick={() => navigate("/checkemail")}
             className="w-full h-12 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg active:translate-y-[1px] hover:opacity-95 transition cursor-pointer"
           >
             Send Email

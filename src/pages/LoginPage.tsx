@@ -1,13 +1,37 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
-const LoginPageUsername: React.FC = () => {
-  const [username, setUsername] = useState("");
+type LoginMode = "email" | "username";
+
+const LoginPage: React.FC = () => {
+  const [mode, setMode] = useState<LoginMode>("email"); // email or username
+  const [identifier, setIdentifier] = useState(""); // email ATAU username
   const [password, setPassword] = useState("");
+  const navigate = useNavigate();
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log({ username, password });
+
+    if (mode === "email") {
+      console.log("Login with email:", { email: identifier, password });
+    } else {
+      console.log("Login with username:", { username: identifier, password });
+    }
+
+    //CHECK MOCK JSON DISINI
+    navigate("/onboardingdb");
   };
+
+  const toggleMode = () => {
+    setMode((prev) => (prev === "email" ? "username" : "email"));
+    setIdentifier("");
+  };
+
+  const placeholderText =
+    mode === "email" ? "Enter your email address" : "Enter your username";
+
+  const toggleButtonText =
+    mode === "email" ? "Log in with username" : "Log in with email";
 
   return (
     <div className="relative w-full h-screen flex items-center justify-start overflow-hidden">
@@ -23,7 +47,7 @@ const LoginPageUsername: React.FC = () => {
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-violet-900/40 to-transparent"></div>
 
-      {/* Noise + Blur */}
+      {/* Subtle noise + dark layer */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
 
       {/* Logo */}
@@ -39,14 +63,16 @@ const LoginPageUsername: React.FC = () => {
         </h1>
 
         <form onSubmit={handleLogin} className="space-y-4">
+          {/* Email / Username field */}
           <input
-            type="text"
-            placeholder="Enter your username"
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            type={mode === "email" ? "email" : "text"}
+            placeholder={placeholderText}
+            value={identifier}
+            onChange={(e) => setIdentifier(e.target.value)}
             className="w-full p-3 rounded-xl bg-white/20 placeholder-gray-300 text-white outline-none backdrop-blur-md"
           />
 
+          {/* Password field */}
           <input
             type="password"
             placeholder="Enter your password"
@@ -57,19 +83,25 @@ const LoginPageUsername: React.FC = () => {
 
           <p className="text-sm">
             Forgot password?{" "}
-            <a className="text-indigo-400 underline cursor-pointer">
+            <Link
+              to="/forgotPassword"
+              className="text-indigo-400 underline cursor-pointer"
+            >
               Click here
-            </a>
+            </Link>
           </p>
 
           <div className="flex gap-3 pt-2">
+            {/* Toggle login method */}
             <button
               type="button"
+              onClick={toggleMode}
               className="flex-1 h-12 rounded-full bg-neutral-700 text-sm font-semibold hover:bg-neutral-600 active:translate-y-[1px] transition cursor-pointer"
             >
-              Log in with email
+              {toggleButtonText}
             </button>
 
+            {/* Submit login */}
             <button
               type="submit"
               className="flex-1 h-12 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg hover:opacity-95 active:translate-y-[1px] transition cursor-pointer"
@@ -77,10 +109,19 @@ const LoginPageUsername: React.FC = () => {
               Log In
             </button>
           </div>
+
+          <div className="flex justify-center pt-4">
+            <Link
+              to="/createaccount"
+              className="text-indigo-300 hover:underline"
+            >
+              I'm new to TAXAVA.
+            </Link>
+          </div>
         </form>
       </div>
     </div>
   );
 };
 
-export default LoginPageUsername;
+export default LoginPage;

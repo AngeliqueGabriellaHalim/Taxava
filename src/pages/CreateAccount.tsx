@@ -3,7 +3,7 @@ import type { FormEvent } from "react";
 import toast from "react-hot-toast";
 import users from "../mock/users.json";
 import { Mail, User, Lock } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface User {
   id: number;
@@ -141,6 +141,11 @@ const CreateAccount: React.FC = () => {
               Create Account
             </button>
           </form>
+          <div className="flex justify-center pt-4">
+            <Link to="/login" className="text-indigo-300 hover:underline">
+              I already have an account.
+            </Link>
+          </div>
         </div>
       </div>
     </div>
