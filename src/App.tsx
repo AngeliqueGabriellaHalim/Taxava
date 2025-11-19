@@ -29,7 +29,7 @@ export default function App() {
         </Route> */}
         <Route path="/onboardingdb" element={<Onboarding />} />
         <Route path="/" element={<Homepage />} />
-        <Route path="*" element={<Navigate to="/" replace />} />
+        <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
       <ToastContainer position="top-center" />
     </BrowserRouter>
