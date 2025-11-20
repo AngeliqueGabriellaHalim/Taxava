@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import type { FormEvent } from "react";
 import toast from "react-hot-toast";
-import users from "../mock/users.json";
+import seedUsers from "../mock/users.json";
 import { Mail, User, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -9,6 +9,7 @@ interface User {
   id: number;
   username: string;
   email: string;
+  password: string;
 }
 
 interface NewUserInput {
@@ -35,26 +36,56 @@ const CreateAccount: React.FC = () => {
     });
   };
 
+  const loadUsers = (): User[] => {
+    const data = localStorage.getItem("users");
+    return data ? JSON.parse(data) : [];
+  };
+
+  const saveUsers = (users: User[]) => {
+    localStorage.setItem("users", JSON.stringify(users));
+  };
+
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    navigate("/login");
-    const found = (users as User[]).some(
-      (user) => user.email.toLowerCase() === form.email.toLowerCase()
-    );
-
-    if (found) {
-      toast.error(`An account with ${form.email} already exists.`);
-      return;
-    }
 
     if (form.password !== form.passwordConfirm) {
       toast.error("Passwords do not match.");
       return;
     }
 
+    const localUsers = loadUsers();
+
+    const existsInMock = (seedUsers as User[]).some(
+      (user) => user.email.toLowerCase() === form.email.toLowerCase()
+    );
+
+    const existsInLocal = localUsers.some(
+      (u) => u.email.toLowerCase() === form.email.toLowerCase()
+    );
+
+    console.log("seedUsers:", seedUsers);
+    console.log("localUsers:", localUsers);
+    console.log("existsInMock:", existsInMock);
+    console.log("existsInLocal:", existsInLocal);
+
+    if (existsInMock || existsInLocal) {
+      toast.error(`An account with ${form.email} already exists.`);
+      return;
+    }
+
+    const newUser: User = {
+      id: localUsers.length > 0 ? localUsers[localUsers.length - 1].id + 1 : 1,
+      username: form.username,
+      email: form.email,
+      password: form.password,
+    };
+
+    const updated = [...localUsers, newUser];
+    saveUsers(updated);
+
     toast.success(`Account created successfully for ${form.username}!`);
 
-    navigate("/login");
+    navigate("/checkemail");
 
     setForm({
       username: "",
