@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import type { FormEvent } from "react";
-import toast from "react-hot-toast";
+import { toast } from "react-toastify";
 import seedUsers from "../mock/users.json";
 import { Mail, User, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
