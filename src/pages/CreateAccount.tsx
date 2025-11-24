@@ -97,6 +97,16 @@ const CreateAccount: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white grid grid-cols-2 relative">
+      <div
+        className="absolute inset-0 bg-cover bg-center"
+        style={{
+          backgroundImage:
+            "url('https://awsimages.detik.net.id/community/media/visual/2019/02/20/403af26a-f60a-491e-a4df-87e6570802bb_169.jpeg?w=1200')",
+        }}
+      ></div>
+      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-violet-900/40 to-transparent"></div>
+      <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
+
       <div className="absolute top-6 left-8 text-xl tracking-[0.3em] font-semibold">
         TAXAVA
       </div>
