@@ -56,7 +56,9 @@ const CreateAccount: React.FC = () => {
     const localUsers = loadUsers();
 
     const existsInMock = (seedUsers as User[]).some(
-      (user) => user.email.toLowerCase() === form.email.toLowerCase()
+      (user) =>
+        user.email.toLowerCase() === form.email.toLowerCase() ||
+        user.username.toLowerCase() === form.username.toLowerCase()
     );
 
     const existsInLocal = localUsers.some(
