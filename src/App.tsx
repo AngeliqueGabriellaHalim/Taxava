@@ -12,6 +12,8 @@ import CheckEmail from "./pages/CheckEmail";
 import Onboarding from "./pages/Onboarding";
 import Homepage from "./pages/Home";
 import { ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
+
 // import MainLayout from "./component/MainLayout";
 
 export default function App() {
