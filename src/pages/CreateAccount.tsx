@@ -62,7 +62,9 @@ const CreateAccount: React.FC = () => {
     );
 
     const existsInLocal = localUsers.some(
-      (u) => u.email.toLowerCase() === form.email.toLowerCase()
+      (u) =>
+        u.email.toLowerCase() === form.email.toLowerCase() ||
+        u.username.toLowerCase() === form.username.toLowerCase()
     );
 
     console.log("seedUsers:", seedUsers);
