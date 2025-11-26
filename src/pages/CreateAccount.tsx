@@ -73,7 +73,7 @@ const CreateAccount: React.FC = () => {
     console.log("existsInLocal:", existsInLocal);
 
     if (existsInMock || existsInLocal) {
-      toast.error(`An account with ${form.email} already exists.`);
+      toast.error(`Username or Email is already used.`);
       return;
     }
 
@@ -89,7 +89,7 @@ const CreateAccount: React.FC = () => {
 
     toast.success(`Account created successfully for ${form.username}!`);
 
-    navigate("/checkemail");
+    navigate("/onboardingdb");
 
     setForm({
       username: "",
