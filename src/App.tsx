@@ -12,6 +12,7 @@ import CheckEmail from "./pages/CheckEmail";
 import Onboarding from "./pages/Onboarding";
 import Homepage from "./pages/Home";
 import CompanySetup from "./pages/CompanySetup";
+import ManageCompanies from "./pages/ManageCompanies.tsx";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -22,6 +23,7 @@ export default function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/" element={<Navigate to="/login" replace />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/createaccount" element={<CreateAccount />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
@@ -33,8 +35,9 @@ export default function App() {
         </Route> */}
         <Route path="/onboardingdb" element={<Onboarding />} />
         <Route path="/company-setup" element={<CompanySetup />} />
+        <Route path="/manage-companies" element={<ManageCompanies />} />
 
-        <Route path="/" element={<Homepage />} />
+        <Route path="/home" element={<Homepage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
       <ToastContainer position="top-center" />

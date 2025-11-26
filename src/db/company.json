@@ -3,30 +3,33 @@
     "id": 1,
     "name": "Nasi Kucings",
     "phone": "122122",
-    "mailingAdress": "pares",
-    "returnAdress": "pares",
-    "sameAdress": true,
+    "mailingAddress": "pares",
+    "returnAddress": "pares",
+    "sameAddress": true,
     "ownerName": "aruan",
-    "ownerEmail": "aruan@hoi.com"
+    "ownerEmail": "aruan@hoi.com",
+    "userId": 1
   },
   {
     "id": 2,
     "name": "Nasi Kucings2",
     "phone": "1221223",
-    "mailingAdress": "unpar",
-    "returnAdress": "pares",
-    "sameAdress": false,
+    "mailingAddress": "unpar",
+    "returnAddress": "pares",
+    "sameAddress": false,
     "ownerName": "aruan",
-    "ownerEmail": "aruan@hoi.com"
+    "ownerEmail": "aruan@hoi.com",
+    "userId": 1
   },
   {
     "id": 3,
     "name": "kucings",
     "phone": "12222",
-    "mailingAdress": "pares",
-    "returnAdress": "unpar",
-    "sameAdress": false,
+    "mailingAddress": "pares",
+    "returnAddress": "unpar",
+    "sameAddress": false,
     "ownerName": "aruan",
-    "ownerEmail": "aruan@hoi.com"
+    "ownerEmail": "aruan@hoi.com",
+    "userId": 2
   }
 ]
