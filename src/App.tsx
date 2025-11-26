@@ -11,6 +11,8 @@ import CreateAccount from "./pages/CreateAccount";
 import CheckEmail from "./pages/CheckEmail";
 import Onboarding from "./pages/Onboarding";
 import Homepage from "./pages/Home";
+import CompanySetup from "./pages/CompanySetup";
+
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -30,6 +32,8 @@ export default function App() {
           <Route path="/" element={<Homepage />} />
         </Route> */}
         <Route path="/onboardingdb" element={<Onboarding />} />
+        <Route path="/company-setup" element={<CompanySetup />} />
+
         <Route path="/" element={<Homepage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />
       </Routes>
