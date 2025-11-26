@@ -1,7 +1,13 @@
 // src/pages/Home.tsx
 import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Home: React.FC = () => {
+  const navigate = useNavigate();
+
+  const handleCompany = () => {
+    navigate("/manage-companies");
+  };
   return (
     <div className="min-h-screen bg-[#191A1F] text-white">
       {/* Logo */}
@@ -29,7 +35,8 @@ const Home: React.FC = () => {
             {/* Button */}
             <button
               type="button"
-              className="px-10 py-2 rounded-full bg-[#7C3AED] text-sm font-semibold hover:opacity-90 active:translate-y-[1px] transition"
+              onClick={handleCompany}
+              className="px-10 py-2 rounded-full bg-[#7C3AED] text-sm font-semibold hover:opacity-90 active:translate-y-[1px] transition cursor-pointer"
             >
               View
             </button>
