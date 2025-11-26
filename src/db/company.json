@@ -1,0 +1,32 @@
+[
+  {
+    "id": 1,
+    "name": "Nasi Kucings",
+    "phone": "122122",
+    "mailingAdress": "pares",
+    "returnAdress": "pares",
+    "sameAdress": true,
+    "ownerName": "aruan",
+    "ownerEmail": "aruan@hoi.com"
+  },
+  {
+    "id": 2,
+    "name": "Nasi Kucings2",
+    "phone": "1221223",
+    "mailingAdress": "unpar",
+    "returnAdress": "pares",
+    "sameAdress": false,
+    "ownerName": "aruan",
+    "ownerEmail": "aruan@hoi.com"
+  },
+  {
+    "id": 3,
+    "name": "kucings",
+    "phone": "12222",
+    "mailingAdress": "pares",
+    "returnAdress": "unpar",
+    "sameAdress": false,
+    "ownerName": "aruan",
+    "ownerEmail": "aruan@hoi.com"
+  }
+]
