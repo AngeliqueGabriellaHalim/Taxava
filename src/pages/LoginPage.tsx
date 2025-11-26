@@ -1,24 +1,54 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { toast } from "react-toastify";
+import seedUsers from "../mock/users.json";
 
 type LoginMode = "email" | "username";
 
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  password: string;
+}
+
 const LoginPage: React.FC = () => {
-  const [mode, setMode] = useState<LoginMode>("email"); // email or username
-  const [identifier, setIdentifier] = useState(""); // email ATAU username
+  const [mode, setMode] = useState<LoginMode>("email");
+  const [identifier, setIdentifier] = useState("");
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
+
+  const loadUsers = (): User[] => {
+    const data = localStorage.getItem("users");
+    return data ? JSON.parse(data) : [];
+  };
 
   const handleLogin = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (mode === "email") {
-      console.log("Login with email:", { email: identifier, password });
-    } else {
-      console.log("Login with username:", { username: identifier, password });
+    const localUsers = loadUsers();
+    const allUsers: User[] = [...localUsers, ...seedUsers];
+
+    const user = allUsers.find((u) => {
+      if (mode === "email") {
+        return (
+          u.email.toLowerCase() === identifier.toLowerCase() &&
+          u.password === password
+        );
+      } else {
+        return (
+          u.username.toLowerCase() === identifier.toLowerCase() &&
+          u.password === password
+        );
+      }
+    });
+
+    if (!user) {
+      toast.error("Invalid credentials. Please try again.");
+      return;
     }
 
-    //CHECK MOCK JSON DISINI
+    toast.success(`Welcome back, ${user.username}!`);
     navigate("/onboardingdb");
   };
 
@@ -47,7 +77,7 @@ const LoginPage: React.FC = () => {
       {/* Gradient Overlay */}
       <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-violet-900/40 to-transparent"></div>
 
-      {/* Subtle noise + dark layer */}
+      {/* Noise layer */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
 
       {/* Logo */}
@@ -63,12 +93,13 @@ const LoginPage: React.FC = () => {
         </h1>
 
         <form onSubmit={handleLogin} className="space-y-4">
-          {/* Email / Username field */}
+          {/* Identifier field (email/username) */}
           <input
             type={mode === "email" ? "email" : "text"}
             placeholder={placeholderText}
             value={identifier}
             onChange={(e) => setIdentifier(e.target.value)}
+            required
             className="w-full p-3 rounded-xl bg-white/20 placeholder-gray-300 text-white outline-none backdrop-blur-md"
           />
 
@@ -78,9 +109,11 @@ const LoginPage: React.FC = () => {
             placeholder="Enter your password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            required
             className="w-full p-3 rounded-xl bg-white/20 placeholder-gray-300 text-white outline-none backdrop-blur-md"
           />
 
+          {/* Forgot password */}
           <p className="text-sm">
             Forgot password?{" "}
             <Link
@@ -91,8 +124,8 @@ const LoginPage: React.FC = () => {
             </Link>
           </p>
 
+          {/* Buttons */}
           <div className="flex gap-3 pt-2">
-            {/* Toggle login method */}
             <button
               type="button"
               onClick={toggleMode}
@@ -101,7 +134,6 @@ const LoginPage: React.FC = () => {
               {toggleButtonText}
             </button>
 
-            {/* Submit login */}
             <button
               type="submit"
               className="flex-1 h-12 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg hover:opacity-95 active:translate-y-[1px] transition cursor-pointer"
@@ -110,6 +142,7 @@ const LoginPage: React.FC = () => {
             </button>
           </div>
 
+          {/* Create Account */}
           <div className="flex justify-center pt-4">
             <Link
               to="/createaccount"
