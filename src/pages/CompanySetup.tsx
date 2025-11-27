@@ -27,7 +27,14 @@ const CompanySetup: React.FC = () => {
 
   // validasi field input
   const validateData = () => {
-    if (!companyName || !companyNumber || !mailingAddress || !returnAddress || !ownerName || !ownerEmail) {
+    if (
+      !companyName ||
+      !companyNumber ||
+      !mailingAddress ||
+      !returnAddress ||
+      !ownerName ||
+      !ownerEmail
+    ) {
       alert("Please fill all fields.");
       return false;
     }
@@ -46,7 +53,6 @@ const CompanySetup: React.FC = () => {
     return true;
   };
 
-
   const handleAddCompany = () => {
     if (!validateData()) return;
     // jika memenuhi syarat lakukan ini
@@ -56,7 +62,7 @@ const CompanySetup: React.FC = () => {
       mailingAddress,
       returnAddress,
       ownerName,
-      ownerEmail
+      ownerEmail,
     };
 
     console.log("Saved company:", savedData);
@@ -73,17 +79,13 @@ const CompanySetup: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
-
       {/* Card utama */}
       <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10">
-
         {/* Header */}
         <div className="flex justify-between items-center mb-12">
           <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
 
           <h1 className="text-3xl font-bold">Company Setup</h1>
-
-
 
           <button
             onClick={handleAddCompany}
@@ -95,11 +97,11 @@ const CompanySetup: React.FC = () => {
 
         {/* grid 2 kolom */}
         <div className="grid grid-cols-2 gap-x-10 mb-20">
-
-
           {/* Company Name full width */}
           <div className="col-span-2 mb-8">
-            <label className="block mb-2 font-semibold">Enter company name</label>
+            <label className="block mb-2 font-semibold">
+              Enter company name
+            </label>
             <input
               type="text"
               value={companyName}
@@ -108,7 +110,6 @@ const CompanySetup: React.FC = () => {
               className="bg-neutral-800 w-full p-3 rounded-lg"
             />
           </div>
-
 
           {/* kiri */}
           <div className="flex flex-col gap-6">
@@ -134,12 +135,19 @@ const CompanySetup: React.FC = () => {
               onChange={(e) => setReturnAddress(e.target.value)}
               placeholder="Enter package return address"
               disabled={sameAddress}
-              className={`w-full p-3 rounded-lg ${sameAddress ? "bg-neutral-700 cursor-not-allowed" : "bg-neutral-800"
-                }`}
+              className={`w-full p-3 rounded-lg ${
+                sameAddress
+                  ? "bg-neutral-700 cursor-not-allowed"
+                  : "bg-neutral-800"
+              }`}
             />
 
             <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
-              <input type="checkbox" checked={sameAddress} onChange={handleSameAddress} />
+              <input
+                type="checkbox"
+                checked={sameAddress}
+                onChange={handleSameAddress}
+              />
               Same as mailing address
             </label>
           </div>
