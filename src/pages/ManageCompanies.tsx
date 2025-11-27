@@ -96,7 +96,7 @@ const ManageCompanies: React.FC = () => {
           {filteredCompanies.map((company) => (
             <div
               key={company.id}
-              className="bg-gradient-to-br from-zinc-800 to-zinc-900 rounded-2xl p-4 md:p-5 shadow-lg border border-zinc-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+              className="bg-zinc-800 rounded-2xl p-4 md:p-5 shadow-lg border border-zinc-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
             >
               {/* Info */}
               <div className="space-y-1">
