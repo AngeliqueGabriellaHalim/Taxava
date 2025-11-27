@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 
 // state kosong
 const CompanySetup: React.FC = () => {
+  const [companyName, setCompanyName] = useState("");
   const [companyNumber, setCompanyNumber] = useState("");
   const [mailingAddress, setMailingAddress] = useState("");
   const [returnAddress, setReturnAddress] = useState("");
@@ -26,7 +27,7 @@ const CompanySetup: React.FC = () => {
 
   // validasi field input
   const validateData = () => {
-    if (!companyNumber || !mailingAddress || !returnAddress || !ownerName || !ownerEmail) {
+    if (!companyName || !companyNumber || !mailingAddress || !returnAddress || !ownerName || !ownerEmail) {
       alert("Please fill all fields.");
       return false;
     }
@@ -50,6 +51,7 @@ const CompanySetup: React.FC = () => {
     if (!validateData()) return;
     // jika memenuhi syarat lakukan ini
     const savedData = {
+      companyName,
       companyNumber,
       mailingAddress,
       returnAddress,
@@ -60,6 +62,7 @@ const CompanySetup: React.FC = () => {
     console.log("Saved company:", savedData);
 
     // reset lagi
+    setCompanyName("");
     setCompanyNumber("");
     setMailingAddress("");
     setReturnAddress("");
@@ -80,6 +83,8 @@ const CompanySetup: React.FC = () => {
 
           <h1 className="text-3xl font-bold">Company Setup</h1>
 
+
+
           <button
             onClick={handleAddCompany}
             className="bg-violet-500 px-5 py-2 rounded-full text-sm font-semibold shadow-lg hover:opacity-90"
@@ -89,7 +94,21 @@ const CompanySetup: React.FC = () => {
         </div>
 
         {/* grid 2 kolom */}
-        <div className="grid grid-cols-2 gap-16 mb-20">
+        <div className="grid grid-cols-2 gap-x-10 mb-20">
+
+
+          {/* Company Name full width */}
+          <div className="col-span-2 mb-8">
+            <label className="block mb-2 font-semibold">Enter company name</label>
+            <input
+              type="text"
+              value={companyName}
+              onChange={(e) => setCompanyName(e.target.value)}
+              placeholder="Enter company name"
+              className="bg-neutral-800 w-full p-3 rounded-lg"
+            />
+          </div>
+
 
           {/* kiri */}
           <div className="flex flex-col gap-6">
