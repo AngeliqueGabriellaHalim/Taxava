@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import seedUsers from "../mock/users.json";
+import seedUsers from "../db/users.json";
 
 type LoginMode = "email" | "username";
 
