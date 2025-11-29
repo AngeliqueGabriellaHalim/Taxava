@@ -12,7 +12,11 @@ import CheckEmail from "./pages/CheckEmail";
 import Onboarding from "./pages/Onboarding";
 import Homepage from "./pages/Home";
 import CompanySetup from "./pages/CompanySetup";
+import PropertySetup from "./pages/PropertySetup";
 import ManageCompanies from "./pages/ManageCompanies.tsx";
+import ManageProperties from "./pages/ManageProperties.tsx";
+import EditCompany from "./pages/EditCompany.tsx";
+import EditProperty from "./pages/EditProperty.tsx";
 
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -35,7 +39,11 @@ export default function App() {
         </Route> */}
         <Route path="/onboardingdb" element={<Onboarding />} />
         <Route path="/company-setup" element={<CompanySetup />} />
+        <Route path="/property-setup" element={<PropertySetup />} />
         <Route path="/manage-companies" element={<ManageCompanies />} />
+        <Route path="/manage-properties" element={<ManageProperties />} />
+        <Route path="/edit-company" element={<EditCompany />} />
+        <Route path="/edit-property" element={<EditProperty />} />
 
         <Route path="/home" element={<Homepage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />

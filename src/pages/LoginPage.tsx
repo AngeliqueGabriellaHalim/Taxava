@@ -48,6 +48,10 @@ const LoginPage: React.FC = () => {
       return;
     }
 
+    // ✅ Simpan data user yang login ke localStorage seperti “token”
+    // (dipakai oleh halaman lain, misalnya ManageProperties)
+    localStorage.setItem("currentUser", JSON.stringify(user));
+
     toast.success(`Welcome back, ${user.username}!`);
     navigate("/onboardingdb");
   };

@@ -8,6 +8,10 @@ const Home: React.FC = () => {
   const handleCompany = () => {
     navigate("/manage-companies");
   };
+
+  const handleProperty = () => {
+    navigate("/manage-properties");
+  };
   return (
     <div className="min-h-screen bg-[#191A1F] text-white">
       {/* Logo */}
@@ -59,6 +63,7 @@ const Home: React.FC = () => {
             {/* Button */}
             <button
               type="button"
+              onClick={handleProperty}
               className="px-10 py-2 rounded-full bg-[#7C3AED] text-sm font-semibold hover:opacity-90 active:translate-y-[1px] transition"
             >
               Add Property
