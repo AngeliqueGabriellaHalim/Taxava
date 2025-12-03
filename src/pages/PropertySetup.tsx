@@ -190,149 +190,136 @@ const PropertySetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white flex justify-center px-4 py-10">
-      {/* Logo */}
-      <div className="absolute top-6 left-6">
-        <span className="tracking-[0.3em] text-xl font-semibold">TAXAVA</span>
-      </div>
+    <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
+      {/* Card utama */}
+      <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10 relative">
 
-      <div className="w-full max-w-4xl pt-8">
-        {/* Title */}
-        <h1 className="text-4xl md:text-5xl font-bold text-center mb-10">
+        {/* LOGO — selalu di ujung kiri atas card */}
+        <div className="text-xl tracking-[0.3em] font-semibold">
+          TAXAVA
+        </div>
+
+        {/* HEADER */}
+        <div className="flex items-center justify-between mb-12">
+
+        {/* Dummy kiri */}
+        <div className="w-32 opacity-0">TAXAVA</div>
+
+        {/* Judul di tengah */}
+        <h1 className="text-3xl font-bold text-center">
           Property Setup
         </h1>
 
-        <form onSubmit={handleSubmit} className="space-y-8">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {/* LEFT COLUMN */}
-            <div className="space-y-4">
-              {/* Property name */}
-              <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
-                <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
-                <input
-                  type="text"
-                  placeholder="Enter property name"
-                  value={form.name}
-                  onChange={handleChange("name")}
-                  className="flex-1 bg-transparent outline-none text-sm md:text-base placeholder:text-zinc-500"
-                />
-              </div>
+        {/* Dummy kanan (tempat tombol Add kalau nanti kamu pakai lagi) */}
+        <div className="w-32 opacity-0"></div>
+      </div>
 
-              {/* Property type */}
-              <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
-                <span className="text-zinc-400 mr-3">
-                  <CaseSensitive className="w-5 h-5" />
-                </span>
-                <select
-                  value={form.type}
-                  onChange={handleChange("type")}
-                  className="flex-1 bg-transparent outline-none text-sm md:text-base appearance-none pr-6"
-                >
-                  <option value="" disabled>
-                    Select property type
-                  </option>
-                  {propertyTypes.map((t) => (
-                    <option key={t} value={t}>
-                      {t}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-4" />
-              </div>
+      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-10 mb-20">
+        {/* LEFT COLUMN */}
+        <div className="flex flex-col gap-6">
+          {/* Property Name */}
+          <input
+            type="text"
+            placeholder="Enter property name"
+            value={form.name}
+            onChange={handleChange('name')}
+            className="bg-neutral-800 w-full p-3 rounded-lg"
+          />
 
-              {/* Select company */}
-              <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
-                <span className="text-zinc-400 mr-3">
-                  <CaseSensitive className="w-5 h-5" />
-                </span>
-                <select
-                  value={form.companyId}
-                  onChange={handleCompanyChange}
-                  className="flex-1 bg-transparent outline-none text-sm md:text-base appearance-none pr-6"
-                >
-                  <option value="" disabled>
-                    Select company
-                  </option>
-                  {userCompanies.map((c) => (
-                    <option key={c.id} value={c.id}>
-                      {c.name}
-                    </option>
-                  ))}
-                </select>
-                <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-4" />
-              </div>
-            </div>
+          {/* Property Type */}
+          <select
+            value={form.type}
+            onChange={handleChange('type')}
+            className="bg-neutral-800 w-full p-3 rounded-lg"
+          >
+            <option value="" disabled>Select property type</option>
+            {propertyTypes.map((t) => (
+              <option key={t} value={t}>{t}</option>
+            ))}
+          </select>
 
-            {/* RIGHT COLUMN */}
-            <div className="space-y-4">
-              {/* Checkbox: same as company */}
-              <label className="flex items-center gap-2 text-sm text-zinc-200">
-                <input
-                  type="checkbox"
-                  checked={form.sameAsCompany}
-                  onChange={handleCheckbox("sameAsCompany")}
-                  className="w-4 h-4 rounded border-zinc-500 bg-zinc-800"
-                />
-                <span>all the data here is the same as company</span>
-              </label>
+          {/* Select Company */}
+          <select
+            value={form.companyId}
+            onChange={handleCompanyChange}
+            className="bg-neutral-800 w-full p-3 rounded-lg"
+          >
+            <option value="" disabled>Select company</option>
+            {userCompanies.map((c) => (
+              <option key={c.id} value={c.id}>
+                {c.name}
+              </option>
+            ))}
+          </select>
+        </div>
 
-              {/* Owner name */}
-              <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
-                <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
-                <input
-                  type="text"
-                  placeholder="Enter owner name"
-                  value={form.ownerName}
-                  onChange={handleChange("ownerName")}
-                  className="flex-1 bg-transparent outline-none text-sm md:text-base placeholder:text-zinc-500"
-                />
-              </div>
+        {/* RIGHT COLUMN */}
+        <div className="flex flex-col gap-6">
+          {/* Same as company */}
+          <label className="flex items-center text-sm gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.sameAsCompany}
+              onChange={handleCheckbox('sameAsCompany')}
+            />
+            All the data here is the same as company
+          </label>
 
-              {/* Return address */}
-              <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
-                <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
-                <input
-                  type="text"
-                  placeholder="Enter package return address"
-                  value={form.returnAddress}
-                  onChange={handleChange("returnAddress")}
-                  disabled={form.sameAsMailing && !!selectedCompany}
-                  className="flex-1 bg-transparent outline-none text-sm md:text-base placeholder:text-zinc-500 disabled:text-zinc-500"
-                />
-              </div>
+          {/* Owner name */}
+          <input
+            type="text"
+            placeholder="Enter owner name"
+            value={form.ownerName}
+            onChange={handleChange('ownerName')}
+            className="bg-neutral-800 w-full p-3 rounded-lg"
+          />
 
-              {/* Checkbox: same as mailing address */}
-              <label className="flex items-center gap-2 text-sm text-zinc-200">
-                <input
-                  type="checkbox"
-                  checked={form.sameAsMailing}
-                  onChange={handleCheckbox("sameAsMailing")}
-                  className="w-4 h-4 rounded border-zinc-500 bg-zinc-800"
-                />
-                <span>same as mailing address</span>
-              </label>
-            </div>
-          </div>
+          {/* Return address */}
+          <input
+            type="text"
+            placeholder="Enter package return address"
+            value={form.returnAddress}
+            disabled={form.sameAsMailing}
+            onChange={handleChange('returnAddress')}
+            className={`w-full p-3 rounded-lg ${
+              form.sameAsMailing
+                ? 'bg-neutral-700 cursor-not-allowed'
+                : 'bg-neutral-800'
+            }`}
+          />
 
-          {/* Buttons */}
-          <div className="flex justify-center gap-6 pt-6">
-            <button
-              type="submit"
-              className="px-10 py-3 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-base font-semibold shadow-lg hover:opacity-95 active:translate-y-[1px] transition"
-            >
-              Add Property
-            </button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="px-10 py-3 rounded-full bg-red-500 hover:bg-red-400 text-base font-semibold shadow-lg active:translate-y-[1px] transition"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
+          {/* Same as mailing */}
+          <label className="flex items-center text-sm gap-2 cursor-pointer">
+            <input
+              type="checkbox"
+              checked={form.sameAsMailing}
+              onChange={handleCheckbox('sameAsMailing')}
+            />
+            Same as mailing address
+          </label>
+        </div>
+      </form>
+
+      {/* BOTTOM BUTTONS */}
+      <div className="flex justify-center gap-8">
+        <button
+          type="submit"
+          onClick={handleSubmit}
+          className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
+        >
+          Add Property
+        </button>
+
+        <button
+          type="button"
+          onClick={handleCancel}
+          className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
+        >
+          Cancel
+        </button>
       </div>
     </div>
+  </div>
   );
 };
 
