@@ -38,7 +38,7 @@ const ManageProperties: React.FC = () => {
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
 
-  const navigate = useNavigate(); // ⬅️ inisialisasi navigate()
+  const navigate = useNavigate(); // inisialisasi navigate()
 
   // ----- ambil user yang sedang login dari localStorage -----
   const currentUser: User | null = (() => {

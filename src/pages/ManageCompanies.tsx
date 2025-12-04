@@ -4,6 +4,13 @@ import { useNavigate } from "react-router-dom";
 import companiesData from "../db/company.json";
 import { Phone, MapPinHouse, UserRound, Search } from "lucide-react";
 
+type User = {
+  id: number;
+  email: string;
+  username: string;
+  password: string;
+};
+
 interface Company {
   id: number;
   name: string;
@@ -13,6 +20,7 @@ interface Company {
   sameAddress: boolean;
   ownerName: string;
   ownerEmail: string;
+  userId: number;
 }
 
 const ManageCompanies: React.FC = () => {
@@ -20,17 +28,43 @@ const ManageCompanies: React.FC = () => {
   const [sortAsc, setSortAsc] = useState(true);
   const navigate = useNavigate();
 
-  // cast imported JSON to Company[]
-  const companies = companiesData as Company[];
+  // ----- ambil user yang sedang login dari localStorage -----
+  const currentUser: User | null = (() => {
+    try {
+      const raw = localStorage.getItem("currentUser");
+      return raw ? (JSON.parse(raw) as User) : null;
+    } catch {
+      return null;
+    }
+  })();
+  // ----- ambil companies dari localStorage -----
+  const localCompanies: Company[] = (() => {
+    try {
+      const raw = localStorage.getItem("companies");
+      return raw ? (JSON.parse(raw) as Company[]) : [];
+    } catch {
+      return [];
+    }
+  })();
+  // gabungkan data dari JSON + LocalStorage
+  const allCompanies: Company[] = useMemo(() => {
+    return [...(companiesData as Company[]), ...localCompanies];
+  }, [localCompanies]);
+
+  // ----- filter: companies milik user login -----
+  const userCompanies = useMemo(() => {
+    if (!currentUser) return [];
+    return allCompanies.filter((c) => c.userId === currentUser.id);
+  }, [allCompanies, currentUser]);
 
   const filteredCompanies = useMemo(() => {
     const s = search.toLowerCase().trim();
-    let result = companies.filter((c) => c.name.toLowerCase().includes(s));
+    let result = userCompanies.filter((c) => c.name.toLowerCase().includes(s));
     result = result.sort((a, b) =>
       sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
     );
     return result;
-  }, [companies, search, sortAsc]);
+  }, [userCompanies, search, sortAsc]);
 
   const handleEdit = (id: number) => {
     navigate(`/companies/${id}/edit`);
