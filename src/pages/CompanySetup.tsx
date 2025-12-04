@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Link } from "react-router-dom";
+import Navbar from "../component/Navbar";
 
 // state kosong
 const CompanySetup: React.FC = () => {
@@ -78,112 +79,116 @@ const CompanySetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
-      {/* Card utama */}
-      <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10">
-        {/* Header */}
-        <div className="flex justify-between items-center mb-12">
-          <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
+    <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
+      {/* Navbar */}
+      <Navbar />
+      <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
+        {/* Card utama */}
+        <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10">
+          {/* Header */}
+          <div className="flex justify-between items-center mb-12">
+            <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
 
-          <h1 className="text-3xl font-bold">Company Setup</h1>
+            <h1 className="text-3xl font-bold">Company Setup</h1>
 
-          <button
-            onClick={handleAddCompany}
-            className="bg-violet-500 px-5 py-2 rounded-full text-sm font-semibold shadow-lg hover:opacity-90"
-          >
-            Add Company
-          </button>
-        </div>
-
-        {/* grid 2 kolom */}
-        <div className="grid grid-cols-2 gap-x-10 mb-20">
-          {/* Company Name full width */}
-          <div className="col-span-2 mb-8">
-            <label className="block mb-2 font-semibold">
-              Enter company name
-            </label>
-            <input
-              type="text"
-              value={companyName}
-              onChange={(e) => setCompanyName(e.target.value)}
-              placeholder="Enter company name"
-              className="bg-neutral-800 w-full p-3 rounded-lg"
-            />
+            <button
+              onClick={handleAddCompany}
+              className="bg-violet-500 px-5 py-2 rounded-full text-sm font-semibold shadow-lg hover:opacity-90"
+            >
+              Add Company
+            </button>
           </div>
 
-          {/* kiri */}
-          <div className="flex flex-col gap-6">
-            <input
-              type="text"
-              value={companyNumber}
-              onChange={(e) => setCompanyNumber(e.target.value)}
-              placeholder="Enter company number"
-              className="bg-neutral-800 w-full p-3 rounded-lg"
-            />
-
-            <input
-              type="text"
-              value={mailingAddress}
-              onChange={(e) => handleMailingChange(e.target.value)}
-              placeholder="Enter mailing address"
-              className="bg-neutral-800 w-full p-3 rounded-lg"
-            />
-
-            <input
-              type="text"
-              value={returnAddress}
-              onChange={(e) => setReturnAddress(e.target.value)}
-              placeholder="Enter package return address"
-              disabled={sameAddress}
-              className={`w-full p-3 rounded-lg ${
-                sameAddress
-                  ? "bg-neutral-700 cursor-not-allowed"
-                  : "bg-neutral-800"
-              }`}
-            />
-
-            <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
+          {/* grid 2 kolom */}
+          <div className="grid grid-cols-2 gap-x-10 mb-20">
+            {/* Company Name full width */}
+            <div className="col-span-2 mb-8">
+              <label className="block mb-2 font-semibold">
+                Enter company name
+              </label>
               <input
-                type="checkbox"
-                checked={sameAddress}
-                onChange={handleSameAddress}
+                type="text"
+                value={companyName}
+                onChange={(e) => setCompanyName(e.target.value)}
+                placeholder="Enter company name"
+                className="bg-neutral-800 w-full p-3 rounded-lg"
               />
-              Same as mailing address
-            </label>
+            </div>
+
+            {/* kiri */}
+            <div className="flex flex-col gap-6">
+              <input
+                type="text"
+                value={companyNumber}
+                onChange={(e) => setCompanyNumber(e.target.value)}
+                placeholder="Enter company number"
+                className="bg-neutral-800 w-full p-3 rounded-lg"
+              />
+
+              <input
+                type="text"
+                value={mailingAddress}
+                onChange={(e) => handleMailingChange(e.target.value)}
+                placeholder="Enter mailing address"
+                className="bg-neutral-800 w-full p-3 rounded-lg"
+              />
+
+              <input
+                type="text"
+                value={returnAddress}
+                onChange={(e) => setReturnAddress(e.target.value)}
+                placeholder="Enter package return address"
+                disabled={sameAddress}
+                className={`w-full p-3 rounded-lg ${
+                  sameAddress
+                    ? "bg-neutral-700 cursor-not-allowed"
+                    : "bg-neutral-800"
+                }`}
+              />
+
+              <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
+                <input
+                  type="checkbox"
+                  checked={sameAddress}
+                  onChange={handleSameAddress}
+                />
+                Same as mailing address
+              </label>
+            </div>
+
+            {/* kanan */}
+            <div className="flex flex-col gap-6">
+              <input
+                type="text"
+                value={ownerName}
+                onChange={(e) => setOwnerName(e.target.value)}
+                placeholder="Enter owner's name"
+                className="bg-neutral-800 w-full p-3 rounded-lg"
+              />
+
+              <input
+                type="email"
+                value={ownerEmail}
+                onChange={(e) => setOwnerEmail(e.target.value)}
+                placeholder="Enter owner's email"
+                className="bg-neutral-800 w-full p-3 rounded-lg"
+              />
+            </div>
           </div>
 
-          {/* kanan */}
-          <div className="flex flex-col gap-6">
-            <input
-              type="text"
-              value={ownerName}
-              onChange={(e) => setOwnerName(e.target.value)}
-              placeholder="Enter owner's name"
-              className="bg-neutral-800 w-full p-3 rounded-lg"
-            />
+          {/* buttons bawah */}
+          <div className="flex justify-center gap-8">
+            <button className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90">
+              Finish Set Up
+            </button>
 
-            <input
-              type="email"
-              value={ownerEmail}
-              onChange={(e) => setOwnerEmail(e.target.value)}
-              placeholder="Enter owner's email"
-              className="bg-neutral-800 w-full p-3 rounded-lg"
-            />
+            <Link
+              to="/home"
+              className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
+            >
+              Cancel
+            </Link>
           </div>
-        </div>
-
-        {/* buttons bawah */}
-        <div className="flex justify-center gap-8">
-          <button className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90">
-            Finish Set Up
-          </button>
-
-          <Link
-            to="/home"
-            className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
-          >
-            Cancel
-          </Link>
         </div>
       </div>
     </div>

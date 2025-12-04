@@ -3,7 +3,7 @@ import { Search, Phone, MapPinHouse, UserRound, Building2 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom"; // ⬅️ tambah useNavigate
 import propertiesData from "../db/property.json";
 import companiesData from "../db/company.json";
-import Navbar from "../component/NavbarProperties";
+import Navbar from "../component/Navbar";
 
 type User = {
   id: number;

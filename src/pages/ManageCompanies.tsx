@@ -4,7 +4,7 @@ import { Navigate, useNavigate } from "react-router-dom";
 import companiesData from "../db/company.json";
 import { Phone, MapPinHouse, UserRound, Search } from "lucide-react";
 
-import Navbar from "../component/NavbarCompanies.tsx";
+import Navbar from "../component/Navbar";
 
 type User = {
   id: number;
