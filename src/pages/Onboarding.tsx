@@ -1,5 +1,13 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  password: string;
+  hasOnboarded: boolean;
+}
 
 const steps = [
   { title: "Company Setup" },
@@ -9,16 +17,60 @@ const steps = [
 
 const Onboarding: React.FC = () => {
   const [currentStep, setCurrentStep] = useState(0);
+  const navigate = useNavigate();
+
+  // --- Utility Functions for Local Storage ---
+  const loadUsers = (): User[] => {
+    const data = localStorage.getItem("users");
+    return data ? JSON.parse(data) : [];
+  };
+
+  const saveUsers = (users: User[]) => {
+    localStorage.setItem("users", JSON.stringify(users));
+  };
+
+  const updateCurrentUserOnboardStatus = () => {
+    const currentUserStr = localStorage.getItem("currentUser");
+    if (!currentUserStr) return;
+
+    const currentUser: User = JSON.parse(currentUserStr);
+
+    // 1. Perbarui user di local storage 'users'
+    const localUsers = loadUsers();
+    const updatedLocalUsers = localUsers.map((u) => {
+      // Cari berdasarkan ID atau email
+      if (u.id === currentUser.id && u.email === currentUser.email) {
+        return { ...u, hasOnboarded: true };
+      }
+      return u;
+    });
+    saveUsers(updatedLocalUsers);
+
+    // 2. Perbarui 'currentUser' di local storage
+    const updatedCurrentUser = { ...currentUser, hasOnboarded: true };
+    localStorage.setItem("currentUser", JSON.stringify(updatedCurrentUser));
+  };
+  // -------------------------------------------
+
 
   const handleStepClick = (index: number) => {
     if (index === currentStep) {
-      setCurrentStep(index + 1);
+      // Jika ini adalah langkah terakhir
+      if (index === steps.length - 1) {
+        // ✅ Perbarui status onboarding
+        updateCurrentUserOnboardStatus();
+        // Arahkan ke dashboard utama setelah selesai
+        navigate("/home");
+      } else {
+        // Pindah ke langkah berikutnya
+        setCurrentStep(index + 1);
+      }
     }
   };
 
   const handleViewClick = (index: number) => {
     console.log("View clicked for step", index);
-    // setelah di complete "Get Started" nanti pathing kemana
+    // Tambahkan logika navigasi atau tampilan detail di sini jika diperlukan
   };
 
   return (
@@ -52,9 +104,8 @@ const Onboarding: React.FC = () => {
         {[0, 1, 2].map((i) => (
           <div
             key={i}
-            className={`w-10 h-10 rounded-full transition ${
-              i <= currentStep ? "bg-violet-500" : "bg-neutral-700"
-            }`}
+            className={`w-10 h-10 rounded-full transition ${i <= currentStep ? "bg-violet-500" : "bg-neutral-700"
+              }`}
           ></div>
         ))}
       </div>
@@ -64,15 +115,14 @@ const Onboarding: React.FC = () => {
         {steps.map((step, index) => {
           const isActive = index === currentStep;
           const isCompleted = index < currentStep;
-          const isFinal = index === 2; // card terakhir yang complete set up secara index [0 1 2]
+          const isFinal = index === 2; // card terakhir
 
-          const buttonLabel = isFinal // final card
+          const buttonLabel = isFinal
             ? "Complete set up"
             : isCompleted
-            ? "View"
-            : "Get Started";
+              ? "View"
+              : "Get Started";
 
-          // cek untuk apakah sudah Get Started atau selesai mengisi form
           const handleClick = () => {
             if (isActive) {
               handleStepClick(index);
@@ -81,9 +131,6 @@ const Onboarding: React.FC = () => {
             }
           };
 
-          {
-            /* card 1, 2, 3 */
-          }
           return (
             <div
               key={index}
@@ -95,23 +142,18 @@ const Onboarding: React.FC = () => {
 
               <button
                 onClick={handleClick}
-                disabled={!isActive && !isCompleted}
-                // cek ketentuan apakah sudah Get Started sebelumnya atau belum
+                // Hanya aktifkan jika index <= currentStep
+                disabled={index > currentStep}
                 className={`w-full h-12 rounded-full text-sm font-semibold transition shadow-lg
-                                    ${
-                                      isFinal
-                                        ? "bg-violet-500 hover:opacity-90"
-                                        : isActive
-                                        ? "bg-violet-600 hover:opacity-90"
-                                        : isCompleted
-                                        ? "bg-violet-500 hover:opacity-90"
-                                        : "bg-neutral-600"
-                                    }
-                                    ${
-                                      !isActive && !isCompleted
-                                        ? "opacity-40 cursor-not-allowed"
-                                        : "cursor-pointer"
-                                    }`}
+                    ${isFinal
+                    ? "bg-violet-500 hover:opacity-90"
+                    : isActive
+                      ? "bg-violet-600 hover:opacity-90"
+                      : isCompleted
+                        ? "bg-violet-500 hover:opacity-90"
+                        : "bg-neutral-600"
+                  }
+                    ${index > currentStep ? "opacity-40 cursor-not-allowed" : "cursor-pointer"}`}
               >
                 {buttonLabel}
               </button>

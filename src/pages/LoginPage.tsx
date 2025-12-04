@@ -10,6 +10,7 @@ interface User {
   username: string;
   email: string;
   password: string;
+  hasOnboarded: boolean;
 }
 
 const LoginPage: React.FC = () => {
@@ -20,6 +21,7 @@ const LoginPage: React.FC = () => {
 
   const loadUsers = (): User[] => {
     const data = localStorage.getItem("users");
+    // Pastikan data dari localStorage memiliki properti hasOnboarded
     return data ? JSON.parse(data) : [];
   };
 
@@ -27,7 +29,12 @@ const LoginPage: React.FC = () => {
     e.preventDefault();
 
     const localUsers = loadUsers();
-    const allUsers: User[] = [...localUsers, ...seedUsers];
+
+    // Gabungkan user local dan seed users. Beri nilai default hasOnboarded: false
+    const allUsers: User[] = [
+      ...localUsers,
+      ...(seedUsers as User[]).map(u => ({ ...u, hasOnboarded: u.hasOnboarded ?? false })),
+    ];
 
     const user = allUsers.find((u) => {
       if (mode === "email") {
@@ -48,12 +55,15 @@ const LoginPage: React.FC = () => {
       return;
     }
 
-    // ✅ Simpan data user yang login ke localStorage seperti “token”
-    // (dipakai oleh halaman lain, misalnya ManageProperties)
     localStorage.setItem("currentUser", JSON.stringify(user));
 
     toast.success(`Welcome back, ${user.username}!`);
-    navigate("/onboardingdb");
+
+    if (user.hasOnboarded) {
+      navigate("/home"); // Sudah onboarding, langsung ke home
+    } else {
+      navigate("/onboardingdb"); // Belum onboarding, ke halaman onboarding
+    }
   };
 
   const toggleMode = () => {
