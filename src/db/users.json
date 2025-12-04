@@ -3,18 +3,21 @@
     "id": 1,
     "email": "user1@example.com",
     "username": "user1",
-    "password": "user1"
+    "password": "user1",
+    "hasOnboarded": true
   },
   {
     "id": 2,
     "email": "user2@example.com",
     "username": "user2",
-    "password": "user2"
+    "password": "user2",
+    "hasOnboarded": false
   },
   {
     "id": 3,
     "email": "user3@taxava.com",
     "username": "user3",
-    "password": "user3"
+    "password": "user3",
+    "hasOnboarded": false
   }
 ]
