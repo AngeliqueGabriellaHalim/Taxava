@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Navigate, useNavigate } from "react-router-dom";
 
 import companiesData from "../db/company.json";
 import { Phone, MapPinHouse, UserRound, Search } from "lucide-react";
@@ -37,6 +37,10 @@ const ManageCompanies: React.FC = () => {
       return null;
     }
   })();
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
   // ----- ambil companies dari localStorage -----
   const localCompanies: Company[] = (() => {
     try {
