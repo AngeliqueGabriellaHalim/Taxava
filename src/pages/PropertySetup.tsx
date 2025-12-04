@@ -4,6 +4,7 @@ import { CaseSensitive, ChevronDown } from "lucide-react"; // ikon 'A' & dropdow
 import companiesData from "../db/company.json";
 import propertiesSeed from "../db/property.json"; // kalau mau pakai sebagai seed
 import { toast } from "react-toastify";
+import Navbar from "../component/Navbar";
 
 type User = {
   id: number;
@@ -190,136 +191,144 @@ const PropertySetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
-      {/* Card utama */}
-      <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10 relative">
+    <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
+      {/* Navbar */}
+      <Navbar />
 
-        {/* LOGO — selalu di ujung kiri atas card */}
-        <div className="text-xl tracking-[0.3em] font-semibold">
-          TAXAVA
-        </div>
+      <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
+        {/* Card utama */}
+        <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10 relative">
+          {/* LOGO — selalu di ujung kiri atas card */}
+          <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
 
-        {/* HEADER */}
-        <div className="flex items-center justify-between mb-12">
+          {/* HEADER */}
+          <div className="flex items-center justify-between mb-12">
+            {/* Dummy kiri */}
+            <div className="w-32 opacity-0">TAXAVA</div>
 
-        {/* Dummy kiri */}
-        <div className="w-32 opacity-0">TAXAVA</div>
+            {/* Judul di tengah */}
+            <h1 className="text-3xl font-bold text-center">Property Setup</h1>
 
-        {/* Judul di tengah */}
-        <h1 className="text-3xl font-bold text-center">
-          Property Setup
-        </h1>
+            {/* Dummy kanan (tempat tombol Add kalau nanti kamu pakai lagi) */}
+            <div className="w-32 opacity-0"></div>
+          </div>
 
-        {/* Dummy kanan (tempat tombol Add kalau nanti kamu pakai lagi) */}
-        <div className="w-32 opacity-0"></div>
-      </div>
-
-      <form onSubmit={handleSubmit} className="grid grid-cols-2 gap-x-10 mb-20">
-        {/* LEFT COLUMN */}
-        <div className="flex flex-col gap-6">
-          {/* Property Name */}
-          <input
-            type="text"
-            placeholder="Enter property name"
-            value={form.name}
-            onChange={handleChange('name')}
-            className="bg-neutral-800 w-full p-3 rounded-lg"
-          />
-
-          {/* Property Type */}
-          <select
-            value={form.type}
-            onChange={handleChange('type')}
-            className="bg-neutral-800 w-full p-3 rounded-lg"
+          <form
+            onSubmit={handleSubmit}
+            className="grid grid-cols-2 gap-x-10 mb-20"
           >
-            <option value="" disabled>Select property type</option>
-            {propertyTypes.map((t) => (
-              <option key={t} value={t}>{t}</option>
-            ))}
-          </select>
+            {/* LEFT COLUMN */}
+            <div className="flex flex-col gap-6">
+              {/* Property Name */}
+              <input
+                type="text"
+                placeholder="Enter property name"
+                value={form.name}
+                onChange={handleChange("name")}
+                className="bg-neutral-800 w-full p-3 rounded-lg"
+              />
 
-          {/* Select Company */}
-          <select
-            value={form.companyId}
-            onChange={handleCompanyChange}
-            className="bg-neutral-800 w-full p-3 rounded-lg"
-          >
-            <option value="" disabled>Select company</option>
-            {userCompanies.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
+              {/* Property Type */}
+              <select
+                value={form.type}
+                onChange={handleChange("type")}
+                className="bg-neutral-800 w-full p-3 rounded-lg"
+              >
+                <option value="" disabled>
+                  Select property type
+                </option>
+                {propertyTypes.map((t) => (
+                  <option key={t} value={t}>
+                    {t}
+                  </option>
+                ))}
+              </select>
+
+              {/* Select Company */}
+              <select
+                value={form.companyId}
+                onChange={handleCompanyChange}
+                className="bg-neutral-800 w-full p-3 rounded-lg"
+              >
+                <option value="" disabled>
+                  Select company
+                </option>
+                {userCompanies.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {/* RIGHT COLUMN */}
+            <div className="flex flex-col gap-6">
+              {/* Same as company */}
+              <label className="flex items-center text-sm gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.sameAsCompany}
+                  onChange={handleCheckbox("sameAsCompany")}
+                />
+                All the data here is the same as company
+              </label>
+
+              {/* Owner name */}
+              <input
+                type="text"
+                placeholder="Enter owner name"
+                value={form.ownerName}
+                onChange={handleChange("ownerName")}
+                className="bg-neutral-800 w-full p-3 rounded-lg"
+              />
+
+              {/* Return address */}
+              <input
+                type="text"
+                placeholder="Enter package return address"
+                value={form.returnAddress}
+                disabled={form.sameAsMailing}
+                onChange={handleChange("returnAddress")}
+                className={`w-full p-3 rounded-lg ${
+                  form.sameAsMailing
+                    ? "bg-neutral-700 cursor-not-allowed"
+                    : "bg-neutral-800"
+                }`}
+              />
+
+              {/* Same as mailing */}
+              <label className="flex items-center text-sm gap-2 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={form.sameAsMailing}
+                  onChange={handleCheckbox("sameAsMailing")}
+                />
+                Same as mailing address
+              </label>
+            </div>
+          </form>
+
+          {/* BOTTOM BUTTONS */}
+          <div className="flex justify-center gap-8">
+            <button
+              type="submit"
+              onClick={handleSubmit}
+              className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
+            >
+              Add Property
+            </button>
+
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
+            >
+              Cancel
+            </button>
+          </div>
         </div>
-
-        {/* RIGHT COLUMN */}
-        <div className="flex flex-col gap-6">
-          {/* Same as company */}
-          <label className="flex items-center text-sm gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.sameAsCompany}
-              onChange={handleCheckbox('sameAsCompany')}
-            />
-            All the data here is the same as company
-          </label>
-
-          {/* Owner name */}
-          <input
-            type="text"
-            placeholder="Enter owner name"
-            value={form.ownerName}
-            onChange={handleChange('ownerName')}
-            className="bg-neutral-800 w-full p-3 rounded-lg"
-          />
-
-          {/* Return address */}
-          <input
-            type="text"
-            placeholder="Enter package return address"
-            value={form.returnAddress}
-            disabled={form.sameAsMailing}
-            onChange={handleChange('returnAddress')}
-            className={`w-full p-3 rounded-lg ${
-              form.sameAsMailing
-                ? 'bg-neutral-700 cursor-not-allowed'
-                : 'bg-neutral-800'
-            }`}
-          />
-
-          {/* Same as mailing */}
-          <label className="flex items-center text-sm gap-2 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={form.sameAsMailing}
-              onChange={handleCheckbox('sameAsMailing')}
-            />
-            Same as mailing address
-          </label>
-        </div>
-      </form>
-
-      {/* BOTTOM BUTTONS */}
-      <div className="flex justify-center gap-8">
-        <button
-          type="submit"
-          onClick={handleSubmit}
-          className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
-        >
-          Add Property
-        </button>
-
-        <button
-          type="button"
-          onClick={handleCancel}
-          className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
-        >
-          Cancel
-        </button>
       </div>
     </div>
-  </div>
   );
 };
 
