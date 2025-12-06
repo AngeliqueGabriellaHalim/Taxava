@@ -1,9 +1,35 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import Navbar from "../component/Navbar";
+import { toast } from "react-toastify"; // Tambahkan jika Anda menggunakan react-toastify
+
+// --- Interfaces ---
+
+interface Company {
+  id: number;
+  name: string;
+  phone: string;
+  mailingAddress: string;
+  returnAddress: string;
+  sameAddress: boolean;
+  ownerName: string;
+  ownerEmail: string;
+  userId: number;
+}
+
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  password: string;
+  hasOnboarded: boolean;
+}
 
 // state kosong
 const CompanySetup: React.FC = () => {
+  const navigate = useNavigate();
+
+  // --- State Input ---
   const [companyName, setCompanyName] = useState("");
   const [companyNumber, setCompanyNumber] = useState("");
   const [mailingAddress, setMailingAddress] = useState("");
@@ -12,6 +38,26 @@ const CompanySetup: React.FC = () => {
 
   const [ownerName, setOwnerName] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
+
+
+  // mendapatkan User
+  const getCurrentUser = (): User | null => {
+    const userStr = localStorage.getItem("currentUser");
+    return userStr ? JSON.parse(userStr) : null;
+  };
+
+  // perusahaan dari local storage
+  const loadCompanies = (): Company[] => {
+    const data = localStorage.getItem("companies");
+    return data ? JSON.parse(data) : [];
+  };
+
+  // Menyimpan semua perusahaan ke local storage
+  const saveCompanies = (companies: Company[]) => {
+    localStorage.setItem("companies", JSON.stringify(companies));
+  };
+
+  // --- Handler Checkbox & Input ---
 
   // handle checkbox
   const handleSameAddress = () => {
@@ -26,6 +72,8 @@ const CompanySetup: React.FC = () => {
     if (sameAddress) setReturnAddress(value);
   };
 
+  // --- Validasi & Logika Penyimpanan ---
+
   // validasi field input
   const validateData = () => {
     if (
@@ -36,18 +84,18 @@ const CompanySetup: React.FC = () => {
       !ownerName ||
       !ownerEmail
     ) {
-      alert("Please fill all fields.");
+      toast.error("Please fill all fields.");
       return false;
     }
 
     if (!/^[0-9]+$/.test(companyNumber)) {
-      alert("Company number must contain numbers only.");
+      toast.error("Company number must contain numbers only.");
       return false;
     }
 
-    // cek format email
+    // cek format email\
     if (!ownerEmail.endsWith("@gmail.com")) {
-      alert("Email must be a valid Gmail address.");
+      toast.error("Email must be a valid Gmail address.");
       return false;
     }
 
@@ -56,19 +104,42 @@ const CompanySetup: React.FC = () => {
 
   const handleAddCompany = () => {
     if (!validateData()) return;
-    // jika memenuhi syarat lakukan ini
-    const savedData = {
-      companyName,
-      companyNumber,
-      mailingAddress,
-      returnAddress,
-      ownerName,
-      ownerEmail,
+
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      toast.error("User not logged in. Please log in first.");
+      return;
+    }
+
+    // Ambil data perusahaan yang sudah ada
+    const existingCompanies = loadCompanies();
+
+    // Tentukan ID baru
+    const newId = existingCompanies.length > 0
+      ? Math.max(...existingCompanies.map(c => c.id)) + 1
+      : 1;
+
+    // data company Baru
+    const newCompany: Company = {
+      id: newId,
+      name: companyName,
+      phone: companyNumber,
+      mailingAddress: mailingAddress,
+      returnAddress: returnAddress,
+      sameAddress: sameAddress,
+      ownerName: ownerName,
+      ownerEmail: ownerEmail,
+      userId: currentUser.id,
     };
 
-    console.log("Saved company:", savedData);
+    // Simpan perusahaan baru ke Local Storage
+    const updatedCompanies = [...existingCompanies, newCompany];
+    saveCompanies(updatedCompanies);
 
-    // reset lagi
+    console.log("Saved company:", newCompany);
+    toast.success(`Company '${companyName}' added successfully!`);
+
+    // reset state
     setCompanyName("");
     setCompanyNumber("");
     setMailingAddress("");
@@ -78,14 +149,27 @@ const CompanySetup: React.FC = () => {
     setOwnerEmail("");
   };
 
+  //  finish set up
+  const handleFinishSetup = () => {
+    const currentUser = getCurrentUser();
+    if (!currentUser) {
+      toast.error("Please log in again.");
+      return;
+    }
+
+    // Asumsi: Onboarding selesai setelah menekan tombol ini.
+    // arah ke /manage-company
+    navigate("/manage-companies");
+  };
+
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
-      {/* Navbar */}
+      {/* navbar */}
       <Navbar />
       <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
-        {/* Card utama */}
+        {/* card utama */}
         <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10">
-          {/* Header */}
+          {/* header */}
           <div className="flex justify-between items-center mb-12">
             <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
 
@@ -101,7 +185,7 @@ const CompanySetup: React.FC = () => {
 
           {/* grid 2 kolom */}
           <div className="grid grid-cols-2 gap-x-10 mb-20">
-            {/* Company Name full width */}
+            {/* company Name full width */}
             <div className="col-span-2 mb-8">
               <label className="block mb-2 font-semibold">
                 Enter company name
@@ -139,11 +223,10 @@ const CompanySetup: React.FC = () => {
                 onChange={(e) => setReturnAddress(e.target.value)}
                 placeholder="Enter package return address"
                 disabled={sameAddress}
-                className={`w-full p-3 rounded-lg ${
-                  sameAddress
-                    ? "bg-neutral-700 cursor-not-allowed"
-                    : "bg-neutral-800"
-                }`}
+                className={`w-full p-3 rounded-lg ${sameAddress
+                  ? "bg-neutral-700 cursor-not-allowed"
+                  : "bg-neutral-800"
+                  }`}
               />
 
               <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
@@ -178,7 +261,10 @@ const CompanySetup: React.FC = () => {
 
           {/* buttons bawah */}
           <div className="flex justify-center gap-8">
-            <button className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90">
+            <button
+              onClick={handleFinishSetup} // ✅ Ganti ke handler baru
+              className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
+            >
               Finish Set Up
             </button>
 
