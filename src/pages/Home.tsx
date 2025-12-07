@@ -1,6 +1,7 @@
 // src/pages/Home.tsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../component/Navbar";
 
 const Home: React.FC = () => {
   const navigate = useNavigate();
@@ -13,21 +14,14 @@ const Home: React.FC = () => {
     navigate("/manage-properties");
   };
   return (
-    <div className="min-h-screen bg-[#191A1F] text-white">
-      {/* Logo */}
-      <header className="px-10 py-6">
-        <h1 className="text-3xl tracking-[0.35em] font-semibold">TAXAVA</h1>
-      </header>
+    <div className="min-h-screen bg-[#191A1F] text-white flex flex-col">
+      <Navbar />
 
-      {/* Cards container */}
-      <main className="flex items-center justify-center min-h-[calc(100vh-80px)]">
+      <main className="flex flex-1 items-center justify-center">
         <div className="flex flex-col md:flex-row gap-50">
-          {/* Company Set Up card */}
           <div className="w-72 h-80 rounded-3xl bg-[#33343A] flex flex-col items-center justify-between py-10 shadow-lg">
-            {/* Purple dot */}
             <div className="w-4 h-4 rounded-full bg-[#7C3AED]" />
 
-            {/* Text */}
             <div className="text-center">
               <p className="text-4xl font-semibold leading-tight">
                 Company
@@ -36,7 +30,6 @@ const Home: React.FC = () => {
               </p>
             </div>
 
-            {/* Button */}
             <button
               type="button"
               onClick={handleCompany}
@@ -46,12 +39,9 @@ const Home: React.FC = () => {
             </button>
           </div>
 
-          {/* Property Set Up card */}
           <div className="w-72 h-80 rounded-3xl bg-[#33343A] flex flex-col items-center justify-between py-10 shadow-lg">
-            {/* Purple ring */}
             <div className="w-5 h-5 rounded-full border-4 border-[#7C3AED]" />
 
-            {/* Text */}
             <div className="text-center">
               <p className="text-4xl font-semibold leading-tight">
                 Property
@@ -60,7 +50,6 @@ const Home: React.FC = () => {
               </p>
             </div>
 
-            {/* Button */}
             <button
               type="button"
               onClick={handleProperty}

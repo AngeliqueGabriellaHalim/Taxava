@@ -1,55 +1,40 @@
-// src/components/Navbar.tsx
-import React, { useContext } from "react";
-import { Link } from "react-router-dom";
-
-
+import React from "react";
+import { useNavigate } from "react-router-dom";
 
 const Navbar: React.FC = () => {
- 
+  const navigate = useNavigate();
 
-  if (!userContext) {
-    return (
-      <nav className="navbar">
-        <div className="navbar-left">
-          <Link
-            to="/"
-            className="navbar-logo text-3xl font-bold text-[hsl(0,0%,100%)] my-auto"
-          >
-            TAXAVA
-          </Link>
-        </div>
-
-        <div className="navbar-center"></div>
-      </nav>
-    );
-  }
-
-  const { user, logoutUser } = userContext;
+  // Logout: cukup hapus currentUser
+  const handleLogout = () => {
+    localStorage.removeItem("currentUser");
+    navigate("/login");
+  };
 
   return (
-    <nav className="navbar">
-      <div className="navbar-left">
-        <Link
-          to="/"
-          className="navbar-logo text-3xl font-bold text-[#FFFFF] my-auto"
+    <nav className="w-full bg-zinc-950 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
+      {/* Logo → Home */}
+      <button
+        onClick={() => navigate("/home")}
+        className="text-xl font-bold tracking-[0.3em] cursor-pointer"
+      >
+        TAXAVA
+      </button>
+
+      {/* Menu kanan */}
+      <div className="flex items-center gap-4 text-zinc-300">
+        <button
+          onClick={() => navigate("/home")}
+          className="px-4 py-2 rounded-full border border-zinc-700 text-sm font-semibold hover:bg-zinc-800 transition"
         >
-          TAXAVA
-        </Link>
-      </div>
+          Home
+        </button>
 
-      <div className="navbar-center"></div>
-
-      <div className="navbar-right">
-        {user && (
-          <Link
-            to="/login"
-            onClick={logoutUser}
-            className="text-white bg-[#574ff2] focus:outline-[#3731ab] active:bg-[#3731ab] hover:bg-[#3731ab] px-4 py-2 font-medium rounded-lg text-sm cursor-pointer"
-          >
-            Log out
-          </Link>
-        )}
-        {}
+        <button
+          onClick={handleLogout}
+          className="px-4 py-2 rounded bg-red-600 hover:bg-red-400 text-sm font-semibold shadow-md transition"
+        >
+          Logout
+        </button>
       </div>
     </nav>
   );

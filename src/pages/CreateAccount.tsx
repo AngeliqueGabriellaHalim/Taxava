@@ -10,6 +10,7 @@ interface User {
   username: string;
   email: string;
   password: string;
+  hasOnboarded: boolean;
 }
 
 interface NewUserInput {
@@ -38,6 +39,7 @@ const CreateAccount: React.FC = () => {
 
   const loadUsers = (): User[] => {
     const data = localStorage.getItem("users");
+    // Pastikan data yang dimuat dari localStorage memiliki properti hasOnboarded
     return data ? JSON.parse(data) : [];
   };
 
@@ -55,7 +57,12 @@ const CreateAccount: React.FC = () => {
 
     const localUsers = loadUsers();
 
-    const existsInMock = (seedUsers as User[]).some(
+    // Pastikan seedUsers juga diperlakukan sebagai User[] dengan hasOnboarded
+    const usersFromSeed = (seedUsers as User[]).map(u => ({ ...u, hasOnboarded: u.hasOnboarded ?? false }));
+    const allUsers = [...localUsers, ...usersFromSeed];
+
+
+    const existsInMock = usersFromSeed.some(
       (user) =>
         user.email.toLowerCase() === form.email.toLowerCase() ||
         user.username.toLowerCase() === form.username.toLowerCase()
@@ -78,17 +85,23 @@ const CreateAccount: React.FC = () => {
     }
 
     const newUser: User = {
-      id: localUsers.length > 0 ? localUsers[localUsers.length - 1].id + 1 : 1,
+      id: allUsers.length > 0 ? allUsers[allUsers.length - 1].id + 1 : 1,
       username: form.username,
       email: form.email,
       password: form.password,
+      // ✅ Set hasOnboarded ke false untuk user baru
+      hasOnboarded: false,
     };
 
     const updated = [...localUsers, newUser];
     saveUsers(updated);
 
+    // ✅ Simpan juga user yang baru dibuat sebagai currentUser untuk login otomatis
+    localStorage.setItem("currentUser", JSON.stringify(newUser));
+
     toast.success(`Account created successfully for ${form.username}!`);
 
+    // Arahkan ke onboarding
     navigate("/onboardingdb");
 
     setForm({
