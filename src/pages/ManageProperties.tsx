@@ -2,6 +2,7 @@ import React, { useMemo, useState } from "react";
 import { Search, Phone, MapPinHouse, UserRound, Building2 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { getPropertiesByUser } from "../utils/getProperty";
+import { getCompaniesByUser } from "../utils/getCompany";
 
 type User = {
   id: number;
@@ -29,6 +30,9 @@ const ManageProperties: React.FC = () => {
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
+
+  const userCompanies = getCompaniesByUser(currentUser.id);
+
   const propertiesOwned = getPropertiesByUser(currentUser.id);
   // ----- search + sort -----
   const filteredProperties = useMemo(() => {
