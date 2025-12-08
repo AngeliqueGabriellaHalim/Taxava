@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import seedUsers from "../db/users.json";
@@ -19,6 +19,19 @@ const LoginPage: React.FC = () => {
   const [password, setPassword] = useState("");
   const navigate = useNavigate();
 
+  useEffect(() => {
+    const user = localStorage.getItem("currentUser");
+
+    if (user) {
+      const userObj = JSON.parse(user);
+      if (userObj.hasOnboarded) {
+        navigate("/home");
+      } else {
+        navigate("/onboardingdb");
+      }
+    }
+  }, []);
+
   const loadUsers = (): User[] => {
     const data = localStorage.getItem("users");
     // Pastikan data dari localStorage memiliki properti hasOnboarded
@@ -33,7 +46,10 @@ const LoginPage: React.FC = () => {
     // Gabungkan user local dan seed users. Beri nilai default hasOnboarded: false
     const allUsers: User[] = [
       ...localUsers,
-      ...(seedUsers as User[]).map(u => ({ ...u, hasOnboarded: u.hasOnboarded ?? false })),
+      ...(seedUsers as User[]).map((u) => ({
+        ...u,
+        hasOnboarded: u.hasOnboarded ?? false,
+      })),
     ];
 
     const user = allUsers.find((u) => {
