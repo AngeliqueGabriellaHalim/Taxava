@@ -1,7 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-
-import companiesData from "../db/company.json";
+import { getCompaniesByUser } from "../utils/getCompany";
 import { Phone, MapPinHouse, UserRound, Search } from "lucide-react";
 
 import Navbar from "../component/Navbar";
@@ -12,18 +11,6 @@ type User = {
   username: string;
   password: string;
 };
-
-interface Company {
-  id: number;
-  name: string;
-  phone: string;
-  mailingAddress: string;
-  returnAddress: string;
-  sameAddress: boolean;
-  ownerName: string;
-  ownerEmail: string;
-  userId: number;
-}
 
 const ManageCompanies: React.FC = () => {
   const [search, setSearch] = useState("");
@@ -43,26 +30,9 @@ const ManageCompanies: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  // ----- ambil companies dari localStorage -----
-  const localCompanies: Company[] = (() => {
-    try {
-      const raw = localStorage.getItem("companies");
-      return raw ? (JSON.parse(raw) as Company[]) : [];
-    } catch {
-      return [];
-    }
-  })();
-  // gabungkan data dari JSON + LocalStorage
-  const allCompanies: Company[] = useMemo(() => {
-    return [...(companiesData as Company[]), ...localCompanies];
-  }, [localCompanies]);
+  const userCompanies = getCompaniesByUser(currentUser.id);
 
-  // ----- filter: companies milik user login -----
-  const userCompanies = useMemo(() => {
-    if (!currentUser) return [];
-    return allCompanies.filter((c) => c.userId === currentUser.id);
-  }, [allCompanies, currentUser]);
-
+  //search and sort
   const filteredCompanies = useMemo(() => {
     const s = search.toLowerCase().trim();
     let result = userCompanies.filter((c) => c.name.toLowerCase().includes(s));
