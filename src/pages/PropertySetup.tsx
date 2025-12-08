@@ -1,19 +1,19 @@
 import React, { useMemo, useState } from "react";
-import { Navigate, useNavigate } from "react-router-dom";
-import { CaseSensitive, ChevronDown } from "lucide-react"; // ikon 'A' & dropdown
-import companiesData from "../db/company.json";
-import propertiesSeed from "../db/property.json"; // kalau mau pakai sebagai seed
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "../component/Navbar";
+import companiesSeed from "../db/company.json";
+import propertiesSeed from "../db/property.json";
 
-type User = {
+interface User {
   id: number;
-  email: string;
   username: string;
+  email: string;
   password: string;
-};
+  hasOnboarded?: boolean;
+}
 
-type Company = {
+interface Company {
   id: number;
   name: string;
   phone: string;
@@ -23,9 +23,9 @@ type Company = {
   ownerName: string;
   ownerEmail: string;
   userId: number;
-};
+}
 
-type Property = {
+interface Property {
   id: number;
   name: string;
   type: string;
@@ -34,204 +34,209 @@ type Property = {
   returnAddress: string;
   sameAddress: boolean;
   companyId: number;
-};
+}
 
 const propertyTypes = ["kos", "ruko", "gudang", "kantor", "lainnya"];
 
 const PropertySetup: React.FC = () => {
   const navigate = useNavigate();
 
-  // --- cek user login ---
-  const currentUser: User | null = (() => {
-    try {
-      const raw = localStorage.getItem("currentUser");
-      return raw ? (JSON.parse(raw) as User) : null;
-    } catch {
-      return null;
-    }
-  })();
+  const getCurrentUser = (): User | null => {
+    const userStr = localStorage.getItem("currentUser");
+    return userStr ? JSON.parse(userStr) : null;
+  };
 
+  const loadAllCompanies = (): Company[] => {
+    const seed = companiesSeed as Company[];
+    const storedRaw = localStorage.getItem("companies");
+    const stored: Company[] = storedRaw ? JSON.parse(storedRaw) : [];
+
+    const map = new Map<number, Company>();
+    seed.forEach((c) => map.set(c.id, c));
+    stored.forEach((c) => map.set(c.id, c));
+
+    return Array.from(map.values());
+  };
+
+  const loadAllProperties = (): Property[] => {
+    const seed = propertiesSeed as Property[];
+    const storedRaw = localStorage.getItem("properties");
+    const stored: Property[] = storedRaw ? JSON.parse(storedRaw) : [];
+
+    const map = new Map<number, Property>();
+    seed.forEach((p) => map.set(p.id, p));
+    stored.forEach((p) => map.set(p.id, p));
+
+    return Array.from(map.values());
+  };
+
+  const saveProperties = (properties: Property[]) => {
+    localStorage.setItem("properties", JSON.stringify(properties));
+  };
+
+  const currentUser = getCurrentUser();
   if (!currentUser) {
+    toast.error("Please log in again.");
     return <Navigate to="/login" replace />;
   }
 
-  const allCompanies = companiesData as Company[];
+  const allCompanies = loadAllCompanies();
 
-  // hanya company milik user login
   const userCompanies = useMemo(
     () => allCompanies.filter((c) => c.userId === currentUser.id),
     [allCompanies, currentUser.id]
   );
 
-  type FormState = {
-    name: string;
-    type: string;
-    companyId: string; // disimpan sebagai string untuk binding <select>
-    ownerName: string;
-    returnAddress: string;
-    sameAsCompany: boolean;
-    sameAsMailing: boolean;
-  };
+  const [propertyName, setPropertyName] = useState("");
+  const [propertyType, setPropertyType] = useState("");
+  const [companyId, setCompanyId] = useState<string>("");
 
-  const [form, setForm] = useState<FormState>({
-    name: "",
-    type: "",
-    companyId: "",
-    ownerName: "",
-    returnAddress: "",
-    sameAsCompany: false,
-    sameAsMailing: false,
-  });
+  const [ownerName, setOwnerName] = useState("");
+  const [returnAddress, setReturnAddress] = useState("");
+  const [sameAsMailing, setSameAsMailing] = useState(false);
+  const [sameAsCompany, setSameAsCompany] = useState(false);
 
-  const selectedCompany = userCompanies.find(
-    (c) => c.id === Number(form.companyId)
-  );
-
-  // mailingAddress property akan diambil dari company yang dipilih
+  const selectedCompany = userCompanies.find((c) => c.id === Number(companyId));
   const mailingAddress = selectedCompany?.mailingAddress ?? "";
 
-  const handleChange =
-    (field: keyof FormState) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const value = e.target.value;
-      setForm((prev) => ({
-        ...prev,
-        [field]: value,
-      }));
-    };
+  const handleSameAsCompany = () => {
+    const checked = !sameAsCompany;
+    setSameAsCompany(checked);
 
-  const handleCheckbox =
-    (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const checked = e.target.checked;
-      setForm((prev) => ({
-        ...prev,
-        [field]: checked,
-        // jika "all the data here is the same as company":
-        ...(field === "sameAsCompany" && checked && selectedCompany
-          ? {
-              ownerName: selectedCompany.ownerName,
-              // return address ikut mailing company jika juga sameAsMailing
-              returnAddress: prev.sameAsMailing
-                ? selectedCompany.mailingAddress
-                : prev.returnAddress,
-            }
-          : {}),
-        // jika "same as mailing address" diaktifkan:
-        ...(field === "sameAsMailing" && checked && selectedCompany
-          ? {
-              returnAddress: selectedCompany.mailingAddress,
-            }
-          : {}),
-      }));
-    };
-
-  // kalau user ganti company, dan checkbox-2 aktif, kita sesuaikan nilai terkait
-  const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const companyId = e.target.value;
-    const newCompany = userCompanies.find((c) => c.id === Number(companyId));
-
-    setForm((prev) => ({
-      ...prev,
-      companyId,
-      ...(prev.sameAsCompany && newCompany
-        ? { ownerName: newCompany.ownerName }
-        : {}),
-      ...(prev.sameAsMailing && newCompany
-        ? { returnAddress: newCompany.mailingAddress }
-        : {}),
-    }));
+    if (checked && selectedCompany) {
+      setOwnerName(selectedCompany.ownerName);
+      if (sameAsMailing) {
+        setReturnAddress(selectedCompany.mailingAddress);
+      }
+    }
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleSameAsMailing = () => {
+    const checked = !sameAsMailing;
+    setSameAsMailing(checked);
 
+    if (checked && selectedCompany) {
+      setReturnAddress(selectedCompany.mailingAddress);
+    }
+  };
+
+  const handleCompanyChange = (value: string) => {
+    setCompanyId(value);
+    const newCompany = userCompanies.find((c) => c.id === Number(value));
+
+    if (!newCompany) return;
+
+    if (sameAsCompany) {
+      setOwnerName(newCompany.ownerName);
+    }
+    if (sameAsMailing) {
+      setReturnAddress(newCompany.mailingAddress);
+    }
+  };
+
+  const validateData = () => {
+    if (!propertyName || !propertyType || !companyId) {
+      toast.error("Please fill property name, type, and company.");
+      return false;
+    }
+    if (!ownerName) {
+      toast.error("Please fill owner name.");
+      return false;
+    }
+    if (!sameAsMailing && !returnAddress) {
+      toast.error(
+        "Please fill return address or check 'Same as mailing address'."
+      );
+      return false;
+    }
     if (!selectedCompany) {
-      toast.error("Please select a company first.");
-      return;
+      toast.error("Selected company is not valid.");
+      return false;
     }
+    return true;
+  };
 
-    if (!form.name || !form.type) {
-      toast.error("Please fill in property name and type.");
-      return;
-    }
+  const handleAddProperty = () => {
+    if (!validateData() || !selectedCompany) return;
 
-    const finalReturnAddress = form.sameAsMailing
-      ? mailingAddress
-      : form.returnAddress;
+    const allProps = loadAllProperties();
+    const newId =
+      allProps.length > 0 ? Math.max(...allProps.map((p) => p.id)) + 1 : 1;
+
+    const finalReturnAddress = sameAsMailing
+      ? selectedCompany.mailingAddress
+      : returnAddress;
 
     const newProperty: Property = {
-      id: Date.now(), // simple id
-      name: form.name,
-      type: form.type,
+      id: newId,
+      name: propertyName,
+      type: propertyType,
       phone: selectedCompany.phone,
-      mailingAddress: mailingAddress,
+      mailingAddress: selectedCompany.mailingAddress,
       returnAddress: finalReturnAddress,
-      sameAddress: form.sameAsMailing,
+      sameAddress: sameAsMailing,
       companyId: selectedCompany.id,
     };
 
-    // Di sini kamu bisa menyimpan ke localStorage (mirip users)
-    // Misal:
-    const existing = localStorage.getItem("properties");
-    const localProps: Property[] = existing ? JSON.parse(existing) : [];
+    const localRaw = localStorage.getItem("properties");
+    const localProps: Property[] = localRaw ? JSON.parse(localRaw) : [];
+    const updated = [...localProps, newProperty];
 
-    const merged = [
-      ...(propertiesSeed as Property[]),
-      ...localProps,
-      newProperty,
-    ];
-    localStorage.setItem("properties", JSON.stringify(merged));
+    saveProperties(updated);
 
-    toast.success("Property created successfully.");
-    navigate(-1); // kembali ke halaman sebelumnya (Manage Properties)
+    console.log("Saved property:", newProperty);
+    toast.success(`Property '${propertyName}' added successfully!`);
+
+    setPropertyName("");
+    setPropertyType("");
+    setCompanyId("");
+    setOwnerName("");
+    setReturnAddress("");
+    setSameAsMailing(false);
+    setSameAsCompany(false);
   };
 
-  const handleCancel = () => {
-    navigate(-1);
+  const handleFinishSetup = () => {
+    navigate("/manage-properties");
   };
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
-      {/* Navbar */}
       <Navbar />
 
       <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
-        {/* Card utama */}
-        <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10 relative">
-          {/* LOGO — selalu di ujung kiri atas card */}
-          <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
+        <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10">
+          <div className="flex justify-between items-center mb-12">
+            <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
 
-          {/* HEADER */}
-          <div className="flex items-center justify-between mb-12">
-            {/* Dummy kiri */}
-            <div className="w-32 opacity-0">TAXAVA</div>
+            <h1 className="text-3xl font-bold">Property Setup</h1>
 
-            {/* Judul di tengah */}
-            <h1 className="text-3xl font-bold text-center">Property Setup</h1>
-
-            {/* Dummy kanan (tempat tombol Add kalau nanti kamu pakai lagi) */}
-            <div className="w-32 opacity-0"></div>
+            <button
+              onClick={handleAddProperty}
+              className="bg-violet-500 px-5 py-2 rounded-full text-sm font-semibold shadow-lg hover:opacity-90"
+            >
+              Add Property
+            </button>
           </div>
 
-          <form
-            onSubmit={handleSubmit}
-            className="grid grid-cols-2 gap-x-10 mb-20"
-          >
-            {/* LEFT COLUMN */}
-            <div className="flex flex-col gap-6">
-              {/* Property Name */}
+          <div className="grid grid-cols-2 gap-x-10 mb-20">
+            <div className="col-span-2 mb-8">
+              <label className="block mb-2 font-semibold">
+                Enter property name
+              </label>
               <input
                 type="text"
+                value={propertyName}
+                onChange={(e) => setPropertyName(e.target.value)}
                 placeholder="Enter property name"
-                value={form.name}
-                onChange={handleChange("name")}
                 className="bg-neutral-800 w-full p-3 rounded-lg"
               />
+            </div>
 
-              {/* Property Type */}
+            <div className="flex flex-col gap-6">
               <select
-                value={form.type}
-                onChange={handleChange("type")}
+                value={propertyType}
+                onChange={(e) => setPropertyType(e.target.value)}
                 className="bg-neutral-800 w-full p-3 rounded-lg"
               >
                 <option value="" disabled>
@@ -244,10 +249,9 @@ const PropertySetup: React.FC = () => {
                 ))}
               </select>
 
-              {/* Select Company */}
               <select
-                value={form.companyId}
-                onChange={handleCompanyChange}
+                value={companyId}
+                onChange={(e) => handleCompanyChange(e.target.value)}
                 className="bg-neutral-800 w-full p-3 rounded-lg"
               >
                 <option value="" disabled>
@@ -261,70 +265,62 @@ const PropertySetup: React.FC = () => {
               </select>
             </div>
 
-            {/* RIGHT COLUMN */}
             <div className="flex flex-col gap-6">
-              {/* Same as company */}
               <label className="flex items-center text-sm gap-2 cursor-pointer">
                 <input
                   type="checkbox"
-                  checked={form.sameAsCompany}
-                  onChange={handleCheckbox("sameAsCompany")}
+                  checked={sameAsCompany}
+                  onChange={handleSameAsCompany}
                 />
                 All the data here is the same as company
               </label>
 
-              {/* Owner name */}
               <input
                 type="text"
+                value={ownerName}
+                onChange={(e) => setOwnerName(e.target.value)}
                 placeholder="Enter owner name"
-                value={form.ownerName}
-                onChange={handleChange("ownerName")}
                 className="bg-neutral-800 w-full p-3 rounded-lg"
               />
 
-              {/* Return address */}
               <input
                 type="text"
+                value={returnAddress}
+                onChange={(e) => setReturnAddress(e.target.value)}
                 placeholder="Enter package return address"
-                value={form.returnAddress}
-                disabled={form.sameAsMailing}
-                onChange={handleChange("returnAddress")}
+                disabled={sameAsMailing}
                 className={`w-full p-3 rounded-lg ${
-                  form.sameAsMailing
+                  sameAsMailing
                     ? "bg-neutral-700 cursor-not-allowed"
                     : "bg-neutral-800"
                 }`}
               />
 
-              {/* Same as mailing */}
-              <label className="flex items-center text-sm gap-2 cursor-pointer">
+              <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
                 <input
                   type="checkbox"
-                  checked={form.sameAsMailing}
-                  onChange={handleCheckbox("sameAsMailing")}
+                  checked={sameAsMailing}
+                  onChange={handleSameAsMailing}
                 />
                 Same as mailing address
               </label>
             </div>
-          </form>
+          </div>
 
-          {/* BOTTOM BUTTONS */}
           <div className="flex justify-center gap-8">
             <button
-              type="submit"
-              onClick={handleSubmit}
+              onClick={handleFinishSetup}
               className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
             >
-              Add Property
+              Finish Set Up
             </button>
 
-            <button
-              type="button"
-              onClick={handleCancel}
+            <Link
+              to="/home"
               className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
             >
               Cancel
-            </button>
+            </Link>
           </div>
         </div>
       </div>

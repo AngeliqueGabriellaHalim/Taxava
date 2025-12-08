@@ -41,9 +41,9 @@ export default function App() {
         <Route path="/company-setup" element={<CompanySetup />} />
         <Route path="/property-setup" element={<PropertySetup />} />
         <Route path="/manage-companies" element={<ManageCompanies />} />
+        <Route path="/property-setup" element={<PropertySetup />} />
         <Route path="/manage-properties" element={<ManageProperties />} />
-        <Route path="/edit-company" element={<EditCompany />} />
-        <Route path="/edit-property" element={<EditProperty />} />
+        <Route path="/edit-property/:id" element={<EditProperty />} />
 
         <Route path="/home" element={<Homepage />} />
         <Route path="*" element={<Navigate to="/login" replace />} />

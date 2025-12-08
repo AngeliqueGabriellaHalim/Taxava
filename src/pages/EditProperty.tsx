@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import { CaseSensitive, ChevronDown } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import companiesData from "../db/company.json";
+import companiesSeed from "../db/company.json";
 import propertiesSeed from "../db/property.json";
 import Navbar from "../component/Navbar";
 
@@ -34,16 +34,40 @@ type Property = {
   returnAddress: string;
   sameAddress: boolean;
   companyId: number;
+  ownerName: string;
 };
 
 const propertyTypes = ["kos", "ruko", "gudang", "kantor", "lainnya"];
+
+const loadAllCompanies = (): Company[] => {
+  const seed = companiesSeed as Company[];
+  const localRaw = localStorage.getItem("companies");
+  const localCompanies: Company[] = localRaw ? JSON.parse(localRaw) : [];
+
+  const map = new Map<number, Company>();
+  seed.forEach((c) => map.set(c.id, c));
+  localCompanies.forEach((c) => map.set(c.id, c));
+
+  return Array.from(map.values());
+};
+
+const loadAllProperties = (): Property[] => {
+  const seed = propertiesSeed as Property[];
+  const localRaw = localStorage.getItem("properties");
+  const localProps: Property[] = localRaw ? JSON.parse(localRaw) : [];
+
+  const map = new Map<number, Property>();
+  seed.forEach((p) => map.set(p.id, p));
+  localProps.forEach((p) => map.set(p.id, p));
+
+  return Array.from(map.values());
+};
 
 const EditProperty: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // --- cek user login ---
-  const currentUser: User | null = (() => {
+  const currentUser = (() => {
     try {
       const raw = localStorage.getItem("currentUser");
       return raw ? (JSON.parse(raw) as User) : null;
@@ -52,35 +76,18 @@ const EditProperty: React.FC = () => {
     }
   })();
 
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
+  if (!currentUser) return <Navigate to="/login" replace />;
 
-  const allCompanies = companiesData as Company[];
-
-  // hanya company milik user login
-  const userCompanies = useMemo(
-    () => allCompanies.filter((c) => c.userId === currentUser.id),
-    [allCompanies, currentUser.id]
-  );
-
-  const loadAllProperties = (): Property[] => {
-    const localRaw = localStorage.getItem("properties");
-    const localProps: Property[] = localRaw ? JSON.parse(localRaw) : [];
-    const seedProps = propertiesSeed as Property[];
-
-    // gabungkan seed + local, local override kalau id sama
-    const map = new Map<number, Property>();
-    seedProps.forEach((p) => map.set(p.id, p));
-    localProps.forEach((p) => map.set(p.id, p));
-    return Array.from(map.values());
-  };
-
-  const propertyId = Number(id);
+  const allCompanies = loadAllCompanies();
   const allProperties = loadAllProperties();
+  const propertyId = Number(id);
   const property = allProperties.find((p) => p.id === propertyId);
 
-  // kalau property tidak ada atau bukan milik company user, redirect balik
+  const userCompanies = useMemo(
+    () => allCompanies.filter((c) => c.userId === currentUser.id),
+    [allCompanies, currentUser]
+  );
+
   const propertyCompany = property
     ? userCompanies.find((c) => c.id === property.companyId)
     : undefined;
@@ -112,34 +119,31 @@ const EditProperty: React.FC = () => {
     error: "",
   });
 
-  // inisialisasi form dari property
   useEffect(() => {
-    const company = propertyCompany;
-    setForm((prev) => ({
-      ...prev,
+    setForm({
       name: property.name,
       type: property.type,
       companyId: String(property.companyId),
-      ownerName: company?.ownerName ?? "",
+      ownerName: property.ownerName,
       returnAddress: property.returnAddress,
       sameAsCompany: false,
       sameAsMailing: property.sameAddress,
       error: "",
-    }));
-  }, [property, propertyCompany]);
+    });
+  }, []);
 
   const selectedCompany = userCompanies.find(
     (c) => c.id === Number(form.companyId)
   );
+
   const mailingAddress = selectedCompany?.mailingAddress ?? "";
 
   const handleChange =
     (field: keyof FormState) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const value = e.target.value;
       setForm((prev) => ({
         ...prev,
-        [field]: value,
+        [field]: e.target.value,
         error: "",
       }));
     };
@@ -147,27 +151,34 @@ const EditProperty: React.FC = () => {
   const handleCheckbox =
     (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
       const checked = e.target.checked;
-      setForm((prev) => ({
-        ...prev,
-        [field]: checked,
-        error: "",
-        ...(field === "sameAsCompany" && checked && selectedCompany
-          ? { ownerName: selectedCompany.ownerName }
-          : {}),
-        ...(field === "sameAsMailing" && checked && selectedCompany
-          ? { returnAddress: selectedCompany.mailingAddress }
-          : {}),
-      }));
+
+      if (field === "sameAsCompany") {
+        return setForm((prev) => ({
+          ...prev,
+          sameAsCompany: checked,
+          ownerName:
+            checked && selectedCompany
+              ? selectedCompany.ownerName
+              : prev.ownerName,
+        }));
+      }
+
+      if (field === "sameAsMailing") {
+        return setForm((prev) => ({
+          ...prev,
+          sameAsMailing: checked,
+          returnAddress: checked ? mailingAddress : prev.returnAddress,
+        }));
+      }
     };
 
   const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const companyId = e.target.value;
-    const newCompany = userCompanies.find((c) => c.id === Number(companyId));
+    const newCompanyId = e.target.value;
+    const newCompany = userCompanies.find((c) => c.id === Number(newCompanyId));
 
     setForm((prev) => ({
       ...prev,
-      companyId,
-      error: "",
+      companyId: newCompanyId,
       ...(prev.sameAsCompany && newCompany
         ? { ownerName: newCompany.ownerName }
         : {}),
@@ -180,67 +191,55 @@ const EditProperty: React.FC = () => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (!selectedCompany) {
-      setForm((prev) => ({
+    if (!selectedCompany)
+      return setForm((prev) => ({
         ...prev,
         error: "Please select a company.",
       }));
-      return;
-    }
 
-    if (!form.name || !form.type) {
-      setForm((prev) => ({
+    if (!form.name || !form.type)
+      return setForm((prev) => ({
         ...prev,
         error: "Please fill in property name and type.",
       }));
-      return;
-    }
 
-    const finalReturnAddress = form.sameAsMailing
-      ? mailingAddress
+    const finalReturn = form.sameAsMailing
+      ? selectedCompany.mailingAddress
       : form.returnAddress;
 
     const updated: Property = {
       ...property,
       name: form.name,
       type: form.type,
-      mailingAddress: mailingAddress,
-      returnAddress: finalReturnAddress,
+      mailingAddress: selectedCompany.mailingAddress,
+      returnAddress: finalReturn,
       sameAddress: form.sameAsMailing,
       companyId: selectedCompany.id,
+      ownerName: form.ownerName,
     };
 
-    const existing = loadAllProperties();
-    const updatedList = existing.map((p) =>
+    const updatedList = allProperties.map((p) =>
       p.id === updated.id ? updated : p
     );
 
     localStorage.setItem("properties", JSON.stringify(updatedList));
-    toast.success("Property updated successfully.");
+
+    toast.success("Property updated successfully!");
     navigate("/manage-properties");
   };
 
-  const handleCancel = () => {
-    navigate("/manage-properties");
-  };
+  const handleCancel = () => navigate("/manage-properties");
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
-      {/* Navbar */}
       <Navbar />
-      <div className="min-h-screen bg-zinc-900 text-white flex justify-center px-4 py-10">
-        {/* Logo */}
-        <div className="absolute top-6 left-6">
-          <span className="tracking-[0.3em] text-xl font-semibold">TAXAVA</span>
-        </div>
 
+      <div className="min-h-screen bg-zinc-900 text-white flex justify-center px-4 py-10">
         <div className="w-full max-w-4xl pt-8">
-          {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">
             Edit Property
           </h1>
 
-          {/* Error Banner */}
           <div className="mb-6">
             <p className="text-sm text-zinc-300 mb-2">Error Banner</p>
             <div className="bg-zinc-800 rounded-2xl px-4 py-3 min-h-[48px] flex items-center text-sm text-red-300">
@@ -254,29 +253,24 @@ const EditProperty: React.FC = () => {
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* LEFT COLUMN */}
               <div className="space-y-4">
-                {/* Property name */}
                 <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
                   <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
                   <input
                     type="text"
-                    placeholder="Enter property name"
                     value={form.name}
                     onChange={handleChange("name")}
-                    className="flex-1 bg-transparent outline-none text-sm md:text-base placeholder:text-zinc-500"
+                    placeholder="Enter property name"
+                    className="flex-1 bg-transparent outline-none"
                   />
                 </div>
 
-                {/* Property type */}
-                <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
-                  <span className="text-zinc-400 mr-3">
-                    <CaseSensitive className="w-5 h-5" />
-                  </span>
+                <div className="relative flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
+                  <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
                   <select
                     value={form.type}
                     onChange={handleChange("type")}
-                    className="flex-1 bg-transparent outline-none text-sm md:text-base appearance-none pr-6"
+                    className="flex-1 bg-transparent outline-none appearance-none pr-6"
                   >
                     <option value="" disabled>
                       Select property type
@@ -290,15 +284,12 @@ const EditProperty: React.FC = () => {
                   <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-4" />
                 </div>
 
-                {/* Select company */}
-                <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
-                  <span className="text-zinc-400 mr-3">
-                    <CaseSensitive className="w-5 h-5" />
-                  </span>
+                <div className="relative flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
+                  <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
                   <select
                     value={form.companyId}
                     onChange={handleCompanyChange}
-                    className="flex-1 bg-transparent outline-none text-sm md:text-base appearance-none pr-6"
+                    className="flex-1 bg-transparent outline-none appearance-none pr-6"
                   >
                     <option value="" disabled>
                       Select company
@@ -313,69 +304,75 @@ const EditProperty: React.FC = () => {
                 </div>
               </div>
 
-              {/* RIGHT COLUMN */}
               <div className="space-y-4">
-                {/* Checkbox: same as company */}
-                <label className="flex items-center gap-2 text-sm text-zinc-200">
+                <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     checked={form.sameAsCompany}
                     onChange={handleCheckbox("sameAsCompany")}
-                    className="w-4 h-4 rounded border-zinc-500 bg-zinc-800"
                   />
-                  <span>all the data here is the same as company</span>
+                  Same owner as company
                 </label>
 
-                {/* Owner name */}
-                <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
+                <div
+                  className={`flex items-center bg-zinc-800 rounded-2xl px-4 py-3 ${
+                    form.sameAsCompany ? "opacity-60" : ""
+                  }`}
+                >
                   <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
                   <input
                     type="text"
-                    placeholder="Enter owner name"
                     value={form.ownerName}
                     onChange={handleChange("ownerName")}
-                    className="flex-1 bg-transparent outline-none text-sm md:text-base placeholder:text-zinc-500"
+                    placeholder="Enter owner name"
+                    disabled={form.sameAsCompany}
+                    className={`flex-1 bg-transparent outline-none ${
+                      form.sameAsCompany ? "cursor-not-allowed" : ""
+                    }`}
                   />
                 </div>
 
-                {/* Return address */}
-                <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
+                <div
+                  className={`flex items-center bg-zinc-800 rounded-2xl px-4 py-3 ${
+                    form.sameAsMailing ? "opacity-60" : ""
+                  }`}
+                >
                   <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
                   <input
                     type="text"
-                    placeholder="Enter package return address"
                     value={form.returnAddress}
                     onChange={handleChange("returnAddress")}
-                    disabled={form.sameAsMailing && !!selectedCompany}
-                    className="flex-1 bg-transparent outline-none text-sm md:text-base placeholder:text-zinc-500 disabled:text-zinc-500"
+                    placeholder="Enter return address"
+                    disabled={form.sameAsMailing}
+                    className={`flex-1 bg-transparent outline-none ${
+                      form.sameAsMailing ? "cursor-not-allowed" : ""
+                    }`}
                   />
                 </div>
 
-                {/* Checkbox: same as mailing address */}
-                <label className="flex items-center gap-2 text-sm text-zinc-200">
+                <label className="flex items-center gap-2 text-sm">
                   <input
                     type="checkbox"
                     checked={form.sameAsMailing}
                     onChange={handleCheckbox("sameAsMailing")}
-                    className="w-4 h-4 rounded border-zinc-500 bg-zinc-800"
                   />
-                  <span>same as mailing address</span>
+                  Same as mailing address
                 </label>
               </div>
             </div>
 
-            {/* Buttons */}
             <div className="flex justify-center gap-6 pt-6">
               <button
                 type="submit"
-                className="px-10 py-3 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-base font-semibold shadow-lg hover:opacity-95 active:translate-y-[1px] transition"
+                className="px-10 py-3 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500"
               >
                 Save
               </button>
+
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-10 py-3 rounded-full bg-red-500 hover:bg-red-400 text-base font-semibold shadow-lg active:translate-y-[1px] transition"
+                className="px-10 py-3 rounded-full bg-red-500 hover:bg-red-400"
               >
                 Cancel
               </button>

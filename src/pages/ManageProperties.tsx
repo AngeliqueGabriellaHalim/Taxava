@@ -1,6 +1,6 @@
 import React, { useMemo, useState } from "react";
 import { Search, Phone, MapPinHouse, UserRound, Building2 } from "lucide-react";
-import { Navigate, useNavigate } from "react-router-dom"; // ⬅️ tambah useNavigate
+import { Navigate, useNavigate } from "react-router-dom";
 import propertiesData from "../db/property.json";
 import companiesData from "../db/company.json";
 import Navbar from "../component/Navbar";
@@ -39,9 +39,8 @@ const ManageProperties: React.FC = () => {
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
 
-  const navigate = useNavigate(); // inisialisasi navigate()
+  const navigate = useNavigate();
 
-  // ----- ambil user yang sedang login dari localStorage -----
   const currentUser: User | null = (() => {
     try {
       const raw = localStorage.getItem("currentUser");
@@ -51,23 +50,47 @@ const ManageProperties: React.FC = () => {
     }
   })();
 
-  const allCompanies = companiesData as Company[];
-  const allProperties = propertiesData as Property[];
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
 
-  // ----- filter: companies milik user login -----
+  const loadAllCompanies = (): Company[] => {
+    const seed = companiesData as Company[];
+    const storedRaw = localStorage.getItem("companies");
+    const stored: Company[] = storedRaw ? JSON.parse(storedRaw) : [];
+
+    const map = new Map<number, Company>();
+    seed.forEach((c) => map.set(c.id, c));
+    stored.forEach((c) => map.set(c.id, c));
+
+    return Array.from(map.values());
+  };
+
+  const loadAllProperties = (): Property[] => {
+    const seed = propertiesData as Property[];
+    const storedRaw = localStorage.getItem("properties");
+    const stored: Property[] = storedRaw ? JSON.parse(storedRaw) : [];
+
+    const map = new Map<number, Property>();
+    seed.forEach((p) => map.set(p.id, p));
+    stored.forEach((p) => map.set(p.id, p));
+
+    return Array.from(map.values());
+  };
+
+  const allCompanies = loadAllCompanies();
+  const allProperties = loadAllProperties();
+
   const userCompanies = useMemo(() => {
-    if (!currentUser) return [];
     return allCompanies.filter((c) => c.userId === currentUser.id);
-  }, [allCompanies, currentUser]);
+  }, [allCompanies, currentUser.id]);
 
   const userCompanyIds = userCompanies.map((c) => c.id);
 
-  // ----- filter: properties milik user -----
   const propertiesOwned = useMemo(() => {
     return allProperties.filter((p) => userCompanyIds.includes(p.companyId));
   }, [allProperties, userCompanyIds]);
 
-  // ----- search + sort -----
   const filteredProperties = useMemo(() => {
     const lower = search.toLowerCase();
     const filtered = propertiesOwned.filter((p) =>
@@ -79,23 +102,16 @@ const ManageProperties: React.FC = () => {
     );
   }, [propertiesOwned, search, sortAsc]);
 
-  // 🔁 jika belum login → redirect /login
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
-
-  // CLICK HANDLERS
   const handleAdd = () => {
-    navigate("/property-setup"); // ⬅️ pindah ke halaman setup property
+    navigate("/property-setup");
   };
 
   const handleEdit = (id: number) => {
-    navigate(`/edit-property/${id}`); // ⬅️ kirim id property
+    navigate(`/edit-property/${id}`);
   };
 
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
-      {/* NAVBAR */}
       <Navbar />
 
       <div className="flex justify-center px-4 py-8">
@@ -108,7 +124,6 @@ const ManageProperties: React.FC = () => {
             <span className="font-semibold">{currentUser.username}</span>
           </p>
 
-          {/* Search bar */}
           <div className="mb-8">
             <label
               htmlFor="property-search"
@@ -140,10 +155,8 @@ const ManageProperties: React.FC = () => {
             </div>
           </div>
 
-          {/* List title */}
           <h2 className="text-lg font-semibold mb-4">List of Properties</h2>
 
-          {/* Property cards */}
           <div className="space-y-4 mb-10">
             {filteredProperties.length === 0 && (
               <div className="text-zinc-400 text-sm">
@@ -163,12 +176,15 @@ const ManageProperties: React.FC = () => {
                 >
                   <div className="space-y-1">
                     <h3 className="text-2xl font-semibold">{property.name}</h3>
+
                     <p className="text-m text-zinc-300 flex gap-2 items-center">
                       <Phone className="w-4" /> {property.phone}
                     </p>
+
                     <p className="text-m text-zinc-300 flex gap-2 items-center">
                       <MapPinHouse className="w-4" /> {property.mailingAddress}
                     </p>
+
                     <p className="text-m text-zinc-300 flex gap-2 items-center">
                       <UserRound className="w-4" /> Type:{" "}
                       <span className="capitalize">{property.type}</span>
@@ -195,7 +211,6 @@ const ManageProperties: React.FC = () => {
             })}
           </div>
 
-          {/* Add Property */}
           <div className="mt-4 mb-10 pb-6 pt-4 border-t border-zinc-800 bg-zinc-900/60 sticky bottom-0">
             <div className="flex justify-center">
               <button
