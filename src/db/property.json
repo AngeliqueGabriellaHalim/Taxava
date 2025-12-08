@@ -7,7 +7,6 @@
     "mailingAddress": "Mock address",
     "returnAddress": "Mock address",
     "sameAddress": true,
-    "companyId": 1,
-    "userId": 1
+    "companyId": 1
   }
 ]
