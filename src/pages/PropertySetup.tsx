@@ -1,6 +1,5 @@
 import React, { useMemo, useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import { CaseSensitive, ChevronDown } from "lucide-react"; // ikon 'A' & dropdown
 import companiesData from "../db/company.json";
 import propertiesSeed from "../db/property.json"; // kalau mau pakai sebagai seed
 import { toast } from "react-toastify";
@@ -51,17 +50,17 @@ const PropertySetup: React.FC = () => {
     }
   })();
 
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
-
   const allCompanies = companiesData as Company[];
+  const currentUserId = currentUser?.id ?? 0;
 
   // hanya company milik user login
   const userCompanies = useMemo(
-    () => allCompanies.filter((c) => c.userId === currentUser.id),
-    [allCompanies, currentUser.id]
+    () => allCompanies.filter((c) => c.userId === currentUserId),
+    [allCompanies, currentUserId]
   );
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
 
   type FormState = {
     name: string;
