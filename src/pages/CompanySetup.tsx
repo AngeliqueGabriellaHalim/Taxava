@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
 import Navbar from "../component/Navbar";
-import { toast } from "react-toastify"; // Tambahkan jika Anda menggunakan react-toastify
+import { toast } from "react-toastify";
 
 // --- Interfaces ---
 
@@ -38,7 +38,6 @@ const CompanySetup: React.FC = () => {
 
   const [ownerName, setOwnerName] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
-
 
   // mendapatkan User
   const getCurrentUser = (): User | null => {
@@ -115,9 +114,10 @@ const CompanySetup: React.FC = () => {
     const existingCompanies = loadCompanies();
 
     // Tentukan ID baru
-    const newId = existingCompanies.length > 0
-      ? Math.max(...existingCompanies.map(c => c.id)) + 1
-      : 1;
+    const newId =
+      existingCompanies.length > 0
+        ? Math.max(...existingCompanies.map((c) => c.id)) + 1
+        : 1;
 
     // data company Baru
     const newCompany: Company = {
@@ -223,10 +223,11 @@ const CompanySetup: React.FC = () => {
                 onChange={(e) => setReturnAddress(e.target.value)}
                 placeholder="Enter package return address"
                 disabled={sameAddress}
-                className={`w-full p-3 rounded-lg ${sameAddress
-                  ? "bg-neutral-700 cursor-not-allowed"
-                  : "bg-neutral-800"
-                  }`}
+                className={`w-full p-3 rounded-lg ${
+                  sameAddress
+                    ? "bg-neutral-700 cursor-not-allowed"
+                    : "bg-neutral-800"
+                }`}
               />
 
               <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
