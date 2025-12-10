@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from "react";
-import { CaseSensitive, ChevronDown } from "lucide-react";
+import { ChevronDown } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import companiesData from "../db/company.json";
@@ -258,7 +258,6 @@ const EditProperty: React.FC = () => {
               <div className="space-y-4">
                 {/* Property name */}
                 <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
-                  <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
                   <input
                     type="text"
                     placeholder="Enter property name"
@@ -271,12 +270,11 @@ const EditProperty: React.FC = () => {
                 {/* Property type */}
                 <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
                   <span className="text-zinc-400 mr-3">
-                    <CaseSensitive className="w-5 h-5" />
                   </span>
                   <select
                     value={form.type}
                     onChange={handleChange("type")}
-                    className="flex-1 bg-transparent outline-none text-sm md:text-base appearance-none pr-6"
+                    className="flex-1 bg-neutral-800 outline-none text-sm md:text-base appearance-none pr-6"
                   >
                     <option value="" disabled>
                       Select property type
@@ -293,12 +291,11 @@ const EditProperty: React.FC = () => {
                 {/* Select company */}
                 <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
                   <span className="text-zinc-400 mr-3">
-                    <CaseSensitive className="w-5 h-5" />
                   </span>
                   <select
                     value={form.companyId}
                     onChange={handleCompanyChange}
-                    className="flex-1 bg-transparent outline-none text-sm md:text-base appearance-none pr-6"
+                    className="flex-1 bg-neutral-800 outline-none text-sm md:text-base appearance-none pr-6"
                   >
                     <option value="" disabled>
                       Select company
@@ -328,7 +325,6 @@ const EditProperty: React.FC = () => {
 
                 {/* Owner name */}
                 <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
-                  <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
                   <input
                     type="text"
                     placeholder="Enter owner name"
@@ -340,7 +336,6 @@ const EditProperty: React.FC = () => {
 
                 {/* Return address */}
                 <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
-                  <CaseSensitive className="w-5 h-5 text-zinc-400 mr-3" />
                   <input
                     type="text"
                     placeholder="Enter package return address"
