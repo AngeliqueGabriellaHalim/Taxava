@@ -17,7 +17,7 @@ const ManageProperties: React.FC = () => {
 
   const navigate = useNavigate(); //  inisialisasi navigate()
 
-  // ----- ambil user yang sedang login dari localStorage -----
+  // ambil user yang sedang login dari localStorage
   const currentUser: User | null = (() => {
     try {
       const raw = localStorage.getItem("currentUser");
@@ -34,7 +34,7 @@ const ManageProperties: React.FC = () => {
   const userCompanies = getCompaniesByUser(currentUser.id);
 
   const propertiesOwned = getPropertiesByUser(currentUser.id);
-  // ----- search + sort -----
+  // search + sort
   const filteredProperties = useMemo(() => {
     const lower = search.toLowerCase();
     const filtered = propertiesOwned.filter((p) =>

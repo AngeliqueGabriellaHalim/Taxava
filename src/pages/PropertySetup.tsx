@@ -1,7 +1,7 @@
-import React, { useMemo, useState } from "react";
+import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
-import companiesData from "../db/company.json";
-import propertiesSeed from "../db/property.json"; // kalau mau pakai sebagai seed
+import { getCompaniesByUser } from "../utils/getCompany";
+import propertiesDB from "../db/property.json";
 import { toast } from "react-toastify";
 import Navbar from "../component/Navbar";
 
@@ -35,12 +35,12 @@ type Property = {
   companyId: number;
 };
 
-const propertyTypes = ["kos", "ruko", "gudang", "kantor", "lainnya"];
+const propertyTypes = ["Kos", "Ruko", "Gudang", "Kantor", "Lainnya"];
 
 const PropertySetup: React.FC = () => {
   const navigate = useNavigate();
 
-  // --- cek user login ---
+  // cek user login
   const currentUser: User | null = (() => {
     try {
       const raw = localStorage.getItem("currentUser");
@@ -50,17 +50,11 @@ const PropertySetup: React.FC = () => {
     }
   })();
 
-  const allCompanies = companiesData as Company[];
-  const currentUserId = currentUser?.id ?? 0;
-
-  // hanya company milik user login
-  const userCompanies = useMemo(
-    () => allCompanies.filter((c) => c.userId === currentUserId),
-    [allCompanies, currentUserId]
-  );
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
+
+  const userCompanies = getCompaniesByUser(currentUser.id);
 
   type FormState = {
     name: string;
@@ -169,13 +163,12 @@ const PropertySetup: React.FC = () => {
       companyId: selectedCompany.id,
     };
 
-    // Di sini kamu bisa menyimpan ke localStorage (mirip users)
-    // Misal:
+    // menyimpan ke localStorage
     const existing = localStorage.getItem("properties");
     const localProps: Property[] = existing ? JSON.parse(existing) : [];
 
     const merged = [
-      ...(propertiesSeed as Property[]),
+      ...(propertiesDB as Property[]),
       ...localProps,
       newProperty,
     ];
