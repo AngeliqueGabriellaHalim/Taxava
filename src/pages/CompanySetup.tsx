@@ -5,7 +5,6 @@ import { toast } from "react-toastify";
 import INITIAL_COMPANIES_DATA from "../db/company.json";
 
 // Interfaces
-
 interface Company {
   id: number;
   name: string;
@@ -39,27 +38,23 @@ const CompanySetup: React.FC = () => {
   const [ownerName, setOwnerName] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
 
-  // mendapatkan User
+  // Utility Functions
   const getCurrentUser = (): User | null => {
     const userStr = localStorage.getItem("currentUser");
     return userStr ? JSON.parse(userStr) : null;
   };
 
-  // data dari Local Storage (HANYA data buatan user)
   const loadLocalCompanies = (): Company[] => {
     const data = localStorage.getItem("companies");
     return data ? JSON.parse(data) : [];
   };
 
-  // menggabungkan Local Storage dan JSON untuk check ID
   const loadCompaniesForIdCheck = (): Company[] => {
     const localCompanies = loadLocalCompanies();
     const initialData = INITIAL_COMPANIES_DATA as Company[];
-
     return [...localCompanies, ...initialData];
   };
 
-  // Menyimpan semua perusahaan ke local storage
   const saveCompanies = (companies: Company[]) => {
     localStorage.setItem("companies", JSON.stringify(companies));
   };
@@ -77,7 +72,7 @@ const CompanySetup: React.FC = () => {
     if (sameAddress) setReturnAddress(value);
   };
 
-  // validasi dan logika penyimpanan
+  // Validasi dan Logika Penyimpanan
 
   const validateData = useCallback(() => {
     if (
@@ -120,17 +115,13 @@ const CompanySetup: React.FC = () => {
       return;
     }
 
-    //  data gabungan local + JSON
     const allCompaniesForIdCheck = loadCompaniesForIdCheck();
-
-    // cari ID maksimum + 1
     const maxId =
       allCompaniesForIdCheck.length > 0
         ? Math.max(...allCompaniesForIdCheck.map((c) => c.id))
         : 0;
     const newId = maxId + 1;
 
-    // data Company Baru
     const newCompany: Company = {
       id: newId,
       name: companyName,
@@ -143,17 +134,14 @@ const CompanySetup: React.FC = () => {
       userId: currentUser.id,
     };
 
-    const currentLocalCompanies = loadLocalCompanies(); // Akan kosong [] jika belum ada data user
-
-    // Tambahkan perusahaan baru ke array dari Local Storage
+    const currentLocalCompanies = loadLocalCompanies();
     const updatedCompanies = [...currentLocalCompanies, newCompany];
 
-    // Simpan hanya data user (perusahaan baru) ke Local Storage
     saveCompanies(updatedCompanies);
 
     toast.success(`Company '${companyName}' added successfully!`);
 
-    // reset state
+    // Reset state
     setCompanyName("");
     setCompanyNumber("");
     setMailingAddress("");
@@ -163,7 +151,7 @@ const CompanySetup: React.FC = () => {
     setOwnerEmail("");
   };
 
-  //  finish set up
+  // Finish set up (PERBAIKAN NAVIGASI DI SINI)
   const handleFinishSetup = () => {
     const currentUser = getCurrentUser();
     if (!currentUser) {
@@ -171,8 +159,8 @@ const CompanySetup: React.FC = () => {
       return;
     }
 
-    // arah ke /manage-company
-    navigate("/manage-companies");
+    // Navigasi kembali ke Onboarding agar status di-refresh
+    navigate("/onboarding", { replace: true });
   };
 
   return (
@@ -236,11 +224,10 @@ const CompanySetup: React.FC = () => {
                 onChange={(e) => setReturnAddress(e.target.value)}
                 placeholder="Enter package return address"
                 disabled={sameAddress}
-                className={`w-full p-3 rounded-lg ${
-                  sameAddress
+                className={`w-full p-3 rounded-lg ${sameAddress
                     ? "bg-neutral-700 cursor-not-allowed"
                     : "bg-neutral-800"
-                }`}
+                  }`}
               />
 
               <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
