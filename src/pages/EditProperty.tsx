@@ -2,8 +2,8 @@ import React, { useEffect, useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { Navigate, useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import companiesData from "../db/company.json";
-import propertiesSeed from "../db/property.json";
+import { getCompaniesByUser } from "../utils/getCompany";
+import { getPropertiesByUser } from "../utils/getProperty";
 import Navbar from "../component/Navbar";
 
 type User = {
@@ -13,36 +13,23 @@ type User = {
   password: string;
 };
 
-type Company = {
-  id: number;
-  name: string;
-  phone: string;
-  mailingAddress: string;
-  returnAddress: string;
-  sameAddress: boolean;
-  ownerName: string;
-  ownerEmail: string;
-  userId: number;
-};
-
 type Property = {
   id: number;
   name: string;
   type: string;
-  phone: string;
-  mailingAddress: string;
+  owner: string;
   returnAddress: string;
   sameAddress: boolean;
   companyId: number;
 };
 
-const propertyTypes = ["kos", "ruko", "gudang", "kantor", "lainnya"];
+const propertyTypes = ["Kos", "Ruko", "Gudang", "Kantor", "Lainnya"];
 
 const EditProperty: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
 
-  // --- cek user login ---
+  // cek user login
   const currentUser: User | null = (() => {
     try {
       const raw = localStorage.getItem("currentUser");
@@ -56,23 +43,20 @@ const EditProperty: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const allCompanies = companiesData as Company[];
-
   // hanya company milik user login
-  const userCompanies = useMemo(
-    () => allCompanies.filter((c) => c.userId === currentUser.id),
-    [allCompanies, currentUser.id]
-  );
+  const userCompanies = getCompaniesByUser(currentUser.id);
 
   const loadAllProperties = (): Property[] => {
     const localRaw = localStorage.getItem("properties");
     const localProps: Property[] = localRaw ? JSON.parse(localRaw) : [];
-    const seedProps = propertiesSeed as Property[];
 
-    // gabungkan seed + local, local override kalau id sama
+    // Gabungkan seed + local dalam urutan (seed dulu, lalu local)
+    const allProps = getPropertiesByUser(currentUser.id);
+
+    // Buat map, yang terakhir akan menimpa yang sebelumnya
     const map = new Map<number, Property>();
-    seedProps.forEach((p) => map.set(p.id, p));
-    localProps.forEach((p) => map.set(p.id, p));
+    allProps.forEach((p) => map.set(p.id, p));
+
     return Array.from(map.values());
   };
 
@@ -112,21 +96,30 @@ const EditProperty: React.FC = () => {
     error: "",
   });
 
-  // inisialisasi form dari property
-  useEffect(() => {
-    const company = propertyCompany;
-    setForm((prev) => ({
-      ...prev,
+  const initialData = useMemo(
+    () => ({
       name: property.name,
       type: property.type,
       companyId: String(property.companyId),
-      ownerName: company?.ownerName ?? "",
+      ownerName: propertyCompany.ownerName,
       returnAddress: property.returnAddress,
-      sameAsCompany: false,
       sameAsMailing: property.sameAddress,
+    }),
+    [propertyId]
+  ); // Hanya bergantung pada propertyId
+
+  useEffect(() => {
+    setForm({
+      name: initialData.name,
+      type: initialData.type,
+      companyId: initialData.companyId,
+      ownerName: initialData.ownerName,
+      returnAddress: initialData.returnAddress,
+      sameAsCompany: false,
+      sameAsMailing: initialData.sameAsMailing,
       error: "",
-    }));
-  }, [property, propertyCompany]);
+    });
+  }, [initialData]);
 
   const selectedCompany = userCompanies.find(
     (c) => c.id === Number(form.companyId)
@@ -204,7 +197,7 @@ const EditProperty: React.FC = () => {
       ...property,
       name: form.name,
       type: form.type,
-      mailingAddress: mailingAddress,
+      owner: form.ownerName,
       returnAddress: finalReturnAddress,
       sameAddress: form.sameAsMailing,
       companyId: selectedCompany.id,
@@ -269,8 +262,7 @@ const EditProperty: React.FC = () => {
 
                 {/* Property type */}
                 <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
-                  <span className="text-zinc-400 mr-3">
-                  </span>
+                  <span className="text-zinc-400 mr-3"></span>
                   <select
                     value={form.type}
                     onChange={handleChange("type")}
@@ -290,8 +282,7 @@ const EditProperty: React.FC = () => {
 
                 {/* Select company */}
                 <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
-                  <span className="text-zinc-400 mr-3">
-                  </span>
+                  <span className="text-zinc-400 mr-3"></span>
                   <select
                     value={form.companyId}
                     onChange={handleCompanyChange}

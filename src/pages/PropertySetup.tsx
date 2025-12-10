@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { getCompaniesByUser } from "../utils/getCompany";
-import propertiesDB from "../db/property.json";
 import { toast } from "react-toastify";
 import Navbar from "../component/Navbar";
 
@@ -12,29 +11,15 @@ type User = {
   password: string;
 };
 
-type Company = {
-  id: number;
-  name: string;
-  phone: string;
-  mailingAddress: string;
-  returnAddress: string;
-  sameAddress: boolean;
-  ownerName: string;
-  ownerEmail: string;
-  userId: number;
-};
-
 type Property = {
   id: number;
   name: string;
   type: string;
-  phone: string;
-  mailingAddress: string;
+  owner: string;
   returnAddress: string;
   sameAddress: boolean;
   companyId: number;
 };
-
 const propertyTypes = ["Kos", "Ruko", "Gudang", "Kantor", "Lainnya"];
 
 const PropertySetup: React.FC = () => {
@@ -156,8 +141,7 @@ const PropertySetup: React.FC = () => {
       id: Date.now(), // simple id
       name: form.name,
       type: form.type,
-      phone: selectedCompany.phone,
-      mailingAddress: mailingAddress,
+      owner: form.ownerName,
       returnAddress: finalReturnAddress,
       sameAddress: form.sameAsMailing,
       companyId: selectedCompany.id,
@@ -167,12 +151,8 @@ const PropertySetup: React.FC = () => {
     const existing = localStorage.getItem("properties");
     const localProps: Property[] = existing ? JSON.parse(existing) : [];
 
-    const merged = [
-      ...(propertiesDB as Property[]),
-      ...localProps,
-      newProperty,
-    ];
-    localStorage.setItem("properties", JSON.stringify(merged));
+    const mergedLocal = [...localProps, newProperty];
+    localStorage.setItem("properties", JSON.stringify(mergedLocal));
 
     toast.success("Property created successfully.");
     navigate(-1); // kembali ke halaman sebelumnya (Manage Properties)

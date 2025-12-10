@@ -3,8 +3,7 @@
     "id": 1,
     "name": "Mock Property",
     "type": "kos",
-    "phone": "123456",
-    "mailingAddress": "Mock address",
+    "owner": "aruan",
     "returnAddress": "Mock address",
     "sameAddress": true,
     "companyId": 1
