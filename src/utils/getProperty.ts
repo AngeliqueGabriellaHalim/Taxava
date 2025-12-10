@@ -17,31 +17,34 @@ export interface Property {
   id: number;
   name: string;
   type: string;
-  phone: string;
-  mailingAddress: string;
+  owner: string;
   returnAddress: string;
   sameAddress: boolean;
   companyId: number;
 }
+export function loadAllProperties(): Property[] {
+  const localRaw = localStorage.getItem("properties");
+  const localProps: Property[] = localRaw ? JSON.parse(localRaw) : [];
+  const seedProps = propertiesJson as Property[];
 
+  // Gabungkan seed + local dalam urutan (seed dulu, lalu local)
+  const allProps = [...seedProps, ...localProps];
+
+  // Buat map, yang terakhir akan menimpa yang sebelumnya
+  const map = new Map<number, Property>();
+  allProps.forEach((p) => map.set(p.id, p));
+
+  return Array.from(map.values());
+}
 // ambil property milik user
 export function getPropertiesByUser(userId: number): Property[] {
   // ambil company yg dimiliki user
   const companies = getCompaniesByUser(userId);
   const ownedCompanyIds = companies.map((c) => c.id);
 
-  // ambil property dari localstorage
-  const local = (() => {
-    try {
-      const raw = localStorage.getItem("properties");
-      return raw ? (JSON.parse(raw) as Property[]) : [];
-    } catch {
-      return [];
-    }
-  })();
+  // gunakan loadAllProperties untuk menghindari duplikasi
+  const allProperties = loadAllProperties();
 
-  // gabungkan json + local
-  const merged: Property[] = [...(propertiesJson as Property[]), ...local];
   // filter: hanya yg sesuai dengan companyId user
-  return merged.filter((p) => ownedCompanyIds.includes(p.companyId));
+  return allProperties.filter((p) => ownedCompanyIds.includes(p.companyId));
 }
