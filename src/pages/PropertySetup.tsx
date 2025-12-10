@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
+import propertiesDB from "../db/property.json";
 import { getCompaniesByUser } from "../utils/getCompany";
 import { toast } from "react-toastify";
 import Navbar from "../component/Navbar";
@@ -35,7 +36,10 @@ const getNextPropertyId = (): number => {
   }
 
   // Cari ID terbesar
-  const maxId = allProps.reduce((max, property) => (property.id > max ? property.id : max), 0);
+  const maxId = allProps.reduce(
+    (max, property) => (property.id > max ? property.id : max),
+    0
+  );
 
   return maxId + 1;
 };
@@ -88,13 +92,13 @@ const PropertySetup: React.FC = () => {
 
   const handleChange =
     (field: keyof FormState) =>
-      (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const value = e.target.value;
-        setForm((prev) => ({
-          ...prev,
-          [field]: value,
-        }));
-      };
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const value = e.target.value;
+      setForm((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    };
 
   const handleCheckbox =
     (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -105,18 +109,18 @@ const PropertySetup: React.FC = () => {
         // jika "all the data here is the same as company":
         ...(field === "sameAsCompany" && checked && selectedCompany
           ? {
-            ownerName: selectedCompany.ownerName,
-            // return address ikut mailing company jika juga sameAsMailing
-            returnAddress: prev.sameAsMailing
-              ? selectedCompany.mailingAddress
-              : prev.returnAddress,
-          }
+              ownerName: selectedCompany.ownerName,
+              // return address ikut mailing company jika juga sameAsMailing
+              returnAddress: prev.sameAsMailing
+                ? selectedCompany.mailingAddress
+                : prev.returnAddress,
+            }
           : {}),
         // jika "same as mailing address" diaktifkan:
         ...(field === "sameAsMailing" && checked && selectedCompany
           ? {
-            returnAddress: selectedCompany.mailingAddress,
-          }
+              returnAddress: selectedCompany.mailingAddress,
+            }
           : {}),
       }));
     };
@@ -282,10 +286,11 @@ const PropertySetup: React.FC = () => {
                 value={form.returnAddress}
                 disabled={form.sameAsMailing}
                 onChange={handleChange("returnAddress")}
-                className={`w-full p-3 rounded-lg ${form.sameAsMailing
+                className={`w-full p-3 rounded-lg ${
+                  form.sameAsMailing
                     ? "bg-neutral-700 cursor-not-allowed"
                     : "bg-neutral-800"
-                  }`}
+                }`}
               />
 
               {/* Same as mailing */}
