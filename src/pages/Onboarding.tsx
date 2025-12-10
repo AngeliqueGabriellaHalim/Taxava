@@ -1,6 +1,10 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import React, { useState, useEffect, useCallback } from "react";
+import { Link, useNavigate, Navigate, useLocation } from "react-router-dom";
 import Navbar from "../component/Navbar";
+import { getCompaniesByUser } from "../utils/getCompany";
+import { getPropertiesByUser } from "../utils/getProperty";
+
+// --- Interfaces ---
 
 interface User {
   id: number;
@@ -10,66 +14,151 @@ interface User {
   hasOnboarded: boolean;
 }
 
+// Interface Company dan Property tidak perlu didefinisikan lagi di sini 
+
 const steps = [
-  { title: "Company Setup" },
-  { title: "Property Setup" },
+  { title: "Company Setup", path: "/company-setup", type: "company" },
+  { title: "Property Setup", path: "/property-setup", type: "property" },
   { title: "You're all set !" },
 ];
 
+
+// --- Utility Functions for Local Storage & User ---
+
+const loadUsers = (): User[] => {
+  const data = localStorage.getItem("users");
+  return data ? JSON.parse(data) : [];
+};
+
+const saveUsers = (users: User[]) => {
+  localStorage.setItem("users", JSON.stringify(users));
+};
+
+const getCurrentUser = (): User | null => {
+  const raw = localStorage.getItem("currentUser");
+  try {
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+// status
+const checkSetupStatus = (userId: number): { hasCompany: boolean, hasProperty: boolean } => {
+  // Memastikan Company ada (JSON + Local Storage)
+  const companies = getCompaniesByUser(userId);
+  const hasCompany = companies.length > 0;
+
+  // cek properti milik user
+  const properties = getPropertiesByUser(userId);
+  const hasProperty = properties.length > 0;
+
+  return {
+    hasCompany,
+    hasProperty,
+  };
+};
+// -------------------------------------------
+
 const Onboarding: React.FC = () => {
-  const [currentStep, setCurrentStep] = useState(0);
   const navigate = useNavigate();
+  const location = useLocation(); // <-- PENTING: Gunakan useLocation
+  const currentUser = getCurrentUser();
 
-  // --- Utility Functions for Local Storage ---
-  const loadUsers = (): User[] => {
-    const data = localStorage.getItem("users");
-    return data ? JSON.parse(data) : [];
-  };
+  // State untuk menyimpan status setup
+  const [setupStatus, setSetupStatus] = useState({ hasCompany: false, hasProperty: false });
 
-  const saveUsers = (users: User[]) => {
-    localStorage.setItem("users", JSON.stringify(users));
-  };
+  // State langkah saat ini
+  const [currentStep, setCurrentStep] = useState(0);
+
+  // --- Redirect jika belum login ---
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+
+  // Periksa status Onboarding di luar useEffect untuk redirect segera
+  if (currentUser.hasOnboarded) {
+    return <Navigate to="/home" replace />;
+  }
+
+  //  memperbarui status setup dan currentStep
+  const updateSetupAndStep = useCallback(() => {
+    const status = checkSetupStatus(currentUser.id);
+    setSetupStatus(status);
+
+    // logika berurutan
+    if (status.hasCompany && status.hasProperty) {
+      setCurrentStep(2); // langkah 3: Selesai
+    } else if (status.hasCompany) {
+      setCurrentStep(1); // langkah 2: Property Setup
+    } else {
+      setCurrentStep(0); // langkah 1: Company Setup
+    }
+  }, [currentUser.id]); // Tambahkan currentUser.id sebagai dependency
+
+  // --- efek untuk memuat status saat komponen dimuat dan saat navigasi kembali ---
+  useEffect(() => {
+    // 1. Panggil saat pertama kali dimuat atau saat location.key berubah (navigasi internal)
+    updateSetupAndStep();
+
+    // listener untuk refresh status saat tab browser kembali fokus
+    window.addEventListener('focus', updateSetupAndStep);
+
+    return () => {
+      window.removeEventListener('focus', updateSetupAndStep);
+    };
+    // PENTING: Menambahkan location.key sebagai dependency. 
+    // Saat navigasi terjadi dan komponen di-render ulang, location.key berubah, 
+    // yang memicu pemanggilan updateSetupAndStep().
+  }, [updateSetupAndStep, location.key]);
+
 
   const updateCurrentUserOnboardStatus = () => {
-    const currentUserStr = localStorage.getItem("currentUser");
-    if (!currentUserStr) return;
-
-    const currentUser: User = JSON.parse(currentUserStr);
+    // Pengamanan final: Hanya izinkan jika status menunjukkan COMPLETE
+    if (currentStep !== 2) {
+      return;
+    }
 
     // 1. Perbarui user di local storage 'users'
     const localUsers = loadUsers();
     const updatedLocalUsers = localUsers.map((u) => {
-      // Cari berdasarkan ID atau email
-      if (u.id === currentUser.id && u.email === currentUser.email) {
+      if (u.id === currentUser.id) {
         return { ...u, hasOnboarded: true };
       }
       return u;
     });
     saveUsers(updatedLocalUsers);
 
-    // 2. Perbarui 'currentUser' di local storage
+    // update currentUser di local storage
     const updatedCurrentUser = { ...currentUser, hasOnboarded: true };
     localStorage.setItem("currentUser", JSON.stringify(updatedCurrentUser));
-  };
-  // -------------------------------------------
 
-  const handleStepClick = (index: number) => {
-    if (index === currentStep) {
-      // Jika ini adalah langkah terakhir
-      if (index === steps.length - 1) {
-        updateCurrentUserOnboardStatus();
-        // Arahkan ke dashboard utama setelah selesai
-        navigate("/home");
+    // navigasi completed
+    navigate("/home", { replace: true });
+  };
+
+  // ---  tombol Get Started/Complete Setup ---
+  const handleStepAction = (index: number) => {
+    const step = steps[index];
+
+    if (index === 0) { // Company Setup
+      if (!setupStatus.hasCompany) {
+        navigate(step.path!); // Get Started
       } else {
-        // Pindah ke langkah berikutnya
-        setCurrentStep(index + 1);
+        navigate("/manage-companies"); // View
+      }
+    } else if (index === 1) { // Property Setup
+      // Tombol Get Started untuk Property hanya aktif jika Company sudah selesai (currentStep >= 1)
+      if (currentStep >= 1 && !setupStatus.hasProperty) {
+        navigate(step.path!); // Get Started
+      } else if (setupStatus.hasProperty) {
+        navigate("/manage-properties"); // View
+      }
+    } else if (index === 2) { // Complete Setup
+      if (currentStep === 2) {
+        updateCurrentUserOnboardStatus();
       }
     }
-  };
-
-  const handleViewClick = (index: number) => {
-    console.log("View clicked for step", index);
-    // Tambahkan logika navigasi atau tampilan detail di sini jika diperlukan
   };
 
   return (
@@ -110,23 +199,23 @@ const Onboarding: React.FC = () => {
         {/* cards */}
         <div className="flex justify-center gap-8 flex-wrap mt-6">
           {steps.map((step, index) => {
-            const isActive = index === currentStep;
             const isCompleted = index < currentStep;
-            const isFinal = index === 2; // card terakhir
+            const isActive = index === currentStep;
+            const isFinal = index === 2;
 
-            const buttonLabel = isFinal
-              ? "Complete set up"
-              : isCompleted
-                ? "View"
-                : "Get Started";
+            let buttonLabel = "Get Started";
+            if (isFinal) {
+              buttonLabel = "Complete set up";
+            } else if (isCompleted) {
+              buttonLabel = "View";
+            }
 
-            const handleClick = () => {
-              if (isActive) {
-                handleStepClick(index);
-              } else if (isCompleted) {
-                handleViewClick(index);
-              }
-            };
+            // atur disabled:
+            // langkah 1: Tidak disabled (selalu bisa Get Started atau View)
+            // langkah 2: Disabled jika Company belum selesai (currentStep < 1)
+            // langkah 3: Disabled jika Company/Property belum selesai (currentStep < 2)
+            const isDisabled = (index === 1 && currentStep < 1) || (index === 2 && currentStep < 2);
+
 
             return (
               <div
@@ -136,23 +225,20 @@ const Onboarding: React.FC = () => {
                 <h2 className="text-lg font-semibold text-center">
                   {step.title}
                 </h2>
+                {/* Tampilkan Status di Card */}
+                <p className="text-xs text-zinc-400">
+                  {index === 0 && (setupStatus.hasCompany ? "Status: Completed" : "Status: Pending")}
+                  {index === 1 && (setupStatus.hasProperty ? "Status: Completed" : "Status: Pending")}
+                  {index === 2 && (setupStatus.hasCompany && setupStatus.hasProperty ? "Ready to Finish" : "Pending Requirements")}
+                </p>
 
                 <button
-                  onClick={handleClick}
-                  // Hanya aktifkan jika index <= currentStep
-                  disabled={index > currentStep}
+                  onClick={() => handleStepAction(index)}
+                  disabled={isDisabled}
                   className={`w-full h-12 rounded-full text-sm font-semibold transition shadow-lg
-                    ${isFinal
-                      ? "bg-violet-500 hover:opacity-90"
-                      : isActive
-                        ? "bg-violet-600 hover:opacity-90"
-                        : isCompleted
-                          ? "bg-violet-500 hover:opacity-90"
-                          : "bg-neutral-600"
-                    }
-                    ${index > currentStep
-                      ? "opacity-40 cursor-not-allowed"
-                      : "cursor-pointer"
+                    ${isDisabled
+                      ? "bg-neutral-600 opacity-40 cursor-not-allowed"
+                      : "bg-violet-500 hover:opacity-90 cursor-pointer"
                     }`}
                 >
                   {buttonLabel}
