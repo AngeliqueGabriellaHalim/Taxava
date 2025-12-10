@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import type { FormEvent } from "react";
 import { toast } from "react-toastify";
-import seedUsers from "../db/users.json";
+import usersDB from "../db/users.json";
 import { Mail, User, Lock } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 
@@ -39,7 +39,6 @@ const CreateAccount: React.FC = () => {
 
   const loadUsers = (): User[] => {
     const data = localStorage.getItem("users");
-    // Pastikan data yang dimuat dari localStorage memiliki properti hasOnboarded
     return data ? JSON.parse(data) : [];
   };
 
@@ -57,10 +56,11 @@ const CreateAccount: React.FC = () => {
 
     const localUsers = loadUsers();
 
-    // Pastikan seedUsers juga diperlakukan sebagai User[] dengan hasOnboarded
-    const usersFromSeed = (seedUsers as User[]).map(u => ({ ...u, hasOnboarded: u.hasOnboarded ?? false }));
-    const allUsers = [...localUsers, ...usersFromSeed];
-
+    const usersFromSeed = (usersDB as User[]).map((u) => ({
+      ...u,
+      hasOnboarded: u.hasOnboarded ?? false,
+    }));
+    const allUsers = [...usersFromSeed, ...localUsers];
 
     const existsInMock = usersFromSeed.some(
       (user) =>
@@ -74,7 +74,7 @@ const CreateAccount: React.FC = () => {
         u.username.toLowerCase() === form.username.toLowerCase()
     );
 
-    console.log("seedUsers:", seedUsers);
+    console.log("usersDB:", usersDB);
     console.log("localUsers:", localUsers);
     console.log("existsInMock:", existsInMock);
     console.log("existsInLocal:", existsInLocal);
