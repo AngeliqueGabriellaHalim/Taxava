@@ -1,7 +1,8 @@
-import React, { useState } from "react";
-import { Link, useNavigate } from "react-router-dom"; // Import useNavigate
+import React, { useState, useCallback } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../component/Navbar";
-import { toast } from "react-toastify"; // Tambahkan jika Anda menggunakan react-toastify
+import { toast } from "react-toastify";
+import INITIAL_COMPANIES_DATA from "../db/company.json";
 
 // --- Interfaces ---
 
@@ -21,11 +22,11 @@ interface User {
   id: number;
   username: string;
   email: string;
-  password: string;
+  password?: string;
   hasOnboarded: boolean;
 }
 
-// state kosong
+
 const CompanySetup: React.FC = () => {
   const navigate = useNavigate();
 
@@ -46,10 +47,18 @@ const CompanySetup: React.FC = () => {
     return userStr ? JSON.parse(userStr) : null;
   };
 
-  // perusahaan dari local storage
-  const loadCompanies = (): Company[] => {
+  // data dari Local Storage (HANYA data buatan user)
+  const loadLocalCompanies = (): Company[] => {
     const data = localStorage.getItem("companies");
     return data ? JSON.parse(data) : [];
+  };
+
+  // menggabungkan Local Storage dan JSON untuk check ID
+  const loadCompaniesForIdCheck = (): Company[] => {
+    const localCompanies = loadLocalCompanies();
+    const initialData = INITIAL_COMPANIES_DATA as Company[];
+
+    return [...localCompanies, ...initialData];
   };
 
   // Menyimpan semua perusahaan ke local storage
@@ -59,23 +68,20 @@ const CompanySetup: React.FC = () => {
 
   // --- Handler Checkbox & Input ---
 
-  // handle checkbox
   const handleSameAddress = () => {
     const checked = !sameAddress;
     setSameAddress(checked);
     if (checked) setReturnAddress(mailingAddress);
   };
 
-  // menangani email
   const handleMailingChange = (value: string) => {
     setMailingAddress(value);
     if (sameAddress) setReturnAddress(value);
   };
 
-  // --- Validasi & Logika Penyimpanan ---
+  // --- validasi dan logika penyimpanan ---
 
-  // validasi field input
-  const validateData = () => {
+  const validateData = useCallback(() => {
     if (
       !companyName ||
       !companyNumber ||
@@ -93,14 +99,12 @@ const CompanySetup: React.FC = () => {
       return false;
     }
 
-    // cek format email\
-    if (!ownerEmail.endsWith("@gmail.com")) {
-      toast.error("Email must be a valid Gmail address.");
+    if (!/^\S+@\S+\.com$/.test(ownerEmail)) {
+      toast.error("Email must be a valid address ending with .com.");
       return false;
     }
-
     return true;
-  };
+  }, [companyName, companyNumber, mailingAddress, returnAddress, ownerName, ownerEmail]);
 
   const handleAddCompany = () => {
     if (!validateData()) return;
@@ -111,15 +115,17 @@ const CompanySetup: React.FC = () => {
       return;
     }
 
-    // Ambil data perusahaan yang sudah ada
-    const existingCompanies = loadCompanies();
+    //  data gabungan local + JSON
+    const allCompaniesForIdCheck = loadCompaniesForIdCheck();
 
-    // Tentukan ID baru
-    const newId = existingCompanies.length > 0
-      ? Math.max(...existingCompanies.map(c => c.id)) + 1
-      : 1;
+    // cari ID maksimum + 1
+    const maxId = allCompaniesForIdCheck.length > 0
+      ? Math.max(...allCompaniesForIdCheck.map(c => c.id))
+      : 0;
+    const newId = maxId + 1;
 
-    // data company Baru
+
+    // data Company Baru
     const newCompany: Company = {
       id: newId,
       name: companyName,
@@ -132,11 +138,15 @@ const CompanySetup: React.FC = () => {
       userId: currentUser.id,
     };
 
-    // Simpan perusahaan baru ke Local Storage
-    const updatedCompanies = [...existingCompanies, newCompany];
+    const currentLocalCompanies = loadLocalCompanies(); // Akan kosong [] jika belum ada data user
+
+    // Tambahkan perusahaan baru ke array dari Local Storage
+    const updatedCompanies = [...currentLocalCompanies, newCompany];
+
+    // Simpan hanya data user (perusahaan baru) ke Local Storage
     saveCompanies(updatedCompanies);
 
-    console.log("Saved company:", newCompany);
+
     toast.success(`Company '${companyName}' added successfully!`);
 
     // reset state
@@ -149,7 +159,7 @@ const CompanySetup: React.FC = () => {
     setOwnerEmail("");
   };
 
-  //  finish set up
+  //  finish set up
   const handleFinishSetup = () => {
     const currentUser = getCurrentUser();
     if (!currentUser) {
@@ -157,7 +167,6 @@ const CompanySetup: React.FC = () => {
       return;
     }
 
-    // Asumsi: Onboarding selesai setelah menekan tombol ini.
     // arah ke /manage-company
     navigate("/manage-companies");
   };
@@ -262,7 +271,7 @@ const CompanySetup: React.FC = () => {
           {/* buttons bawah */}
           <div className="flex justify-center gap-8">
             <button
-              onClick={handleFinishSetup} // ✅ Ganti ke handler baru
+              onClick={handleFinishSetup}
               className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
             >
               Finish Set Up

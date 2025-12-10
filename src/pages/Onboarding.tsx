@@ -57,7 +57,6 @@ const Onboarding: React.FC = () => {
     if (index === currentStep) {
       // Jika ini adalah langkah terakhir
       if (index === steps.length - 1) {
-        // ✅ Perbarui status onboarding
         updateCurrentUserOnboardStatus();
         // Arahkan ke dashboard utama setelah selesai
         navigate("/home");
@@ -102,9 +101,8 @@ const Onboarding: React.FC = () => {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className={`w-10 h-10 rounded-full transition ${
-                i <= currentStep ? "bg-violet-500" : "bg-neutral-700"
-              }`}
+              className={`w-10 h-10 rounded-full transition ${i <= currentStep ? "bg-violet-500" : "bg-neutral-700"
+                }`}
             ></div>
           ))}
         </div>
@@ -119,8 +117,8 @@ const Onboarding: React.FC = () => {
             const buttonLabel = isFinal
               ? "Complete set up"
               : isCompleted
-              ? "View"
-              : "Get Started";
+                ? "View"
+                : "Get Started";
 
             const handleClick = () => {
               if (isActive) {
@@ -144,19 +142,17 @@ const Onboarding: React.FC = () => {
                   // Hanya aktifkan jika index <= currentStep
                   disabled={index > currentStep}
                   className={`w-full h-12 rounded-full text-sm font-semibold transition shadow-lg
-                    ${
-                      isFinal
-                        ? "bg-violet-500 hover:opacity-90"
-                        : isActive
+                    ${isFinal
+                      ? "bg-violet-500 hover:opacity-90"
+                      : isActive
                         ? "bg-violet-600 hover:opacity-90"
                         : isCompleted
-                        ? "bg-violet-500 hover:opacity-90"
-                        : "bg-neutral-600"
+                          ? "bg-violet-500 hover:opacity-90"
+                          : "bg-neutral-600"
                     }
-                    ${
-                      index > currentStep
-                        ? "opacity-40 cursor-not-allowed"
-                        : "cursor-pointer"
+                    ${index > currentStep
+                      ? "opacity-40 cursor-not-allowed"
+                      : "cursor-pointer"
                     }`}
                 >
                   {buttonLabel}
