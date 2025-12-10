@@ -29,11 +29,8 @@ const ManageCompanies: React.FC = () => {
     return <Navigate to="/login" replace />;
   }
 
-  const userCompanies = useMemo(() => {
-    return getCompaniesByUser(currentUser.id);
-  }, [currentUser.id]);
+  const userCompanies = getCompaniesByUser(currentUser.id);
 
-  //untuk textfiltering / search & sort data
   const filteredCompanies = useMemo(() => {
     const s = search.toLowerCase().trim();
     let result = userCompanies.filter((c) => c.name.toLowerCase().includes(s));

@@ -89,14 +89,12 @@ const CreateAccount: React.FC = () => {
       username: form.username,
       email: form.email,
       password: form.password,
-      // ✅ Set hasOnboarded ke false untuk user baru
       hasOnboarded: false,
     };
 
     const updated = [...localUsers, newUser];
     saveUsers(updated);
 
-    // ✅ Simpan juga user yang baru dibuat sebagai currentUser untuk login otomatis
     localStorage.setItem("currentUser", JSON.stringify(newUser));
 
     toast.success(`Account created successfully for ${form.username}!`);
