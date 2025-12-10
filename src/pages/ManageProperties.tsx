@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from "react";
-import { Search, Phone, MapPinHouse, UserRound, Building2 } from "lucide-react";
+import { Search, MapPinHouse, UserRound, Building2 } from "lucide-react";
 import { Navigate, useNavigate } from "react-router-dom";
 import { getPropertiesByUser } from "../utils/getProperty";
 import { getCompaniesByUser } from "../utils/getCompany";
@@ -129,9 +129,13 @@ const ManageProperties: React.FC = () => {
                 >
                   <div className="space-y-1">
                     <h3 className="text-2xl font-semibold">{property.name}</h3>
-                    <p p className="text-m text-zinc-300 flex gap-2">
+                    <p className="text-m text-zinc-300 flex gap-2">
                       <UserRound className="w-4" />
                       Owner: {property.owner}
+                    </p>
+                    <p className="text-m text-zinc-300 flex gap-2">
+                      <MapPinHouse className="w-4" />
+                      Type: {property.type}
                     </p>
 
                     {company && (
