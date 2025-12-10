@@ -48,11 +48,11 @@ const ManageProperties: React.FC = () => {
 
   // CLICK HANDLERS
   const handleAdd = () => {
-    navigate("/property-setup"); // ⬅️ pindah ke halaman setup property
+    navigate("/property-setup"); //  pindah ke halaman setup property
   };
 
   const handleEdit = (id: number) => {
-    navigate(`/edit-property/${id}`); // ⬅️ kirim id property
+    navigate(`/edit-property/${id}`); //  kirim id property
   };
 
   return (
@@ -146,7 +146,7 @@ const ManageProperties: React.FC = () => {
                 <div className="flex md:flex-col gap-2 md:items-end">
                   <button
                     type="button"
-                    onClick={() => handleEdit(property.id)} // ⬅️ EDIT
+                    onClick={() => handleEdit(property.id)} //  EDIT
                     className="px-5 py-2 rounded-full bg-indigo-500 hover:bg-indigo-400 text-sm font-semibold shadow-md transition"
                   >
                     Edit Property
@@ -162,7 +162,7 @@ const ManageProperties: React.FC = () => {
           <div className="flex justify-center">
             <button
               type="button"
-              onClick={handleAdd} // ⬅️ ADD
+              onClick={handleAdd} //  ADD
               className="px-10 py-3 rounded-full bg-indigo-500 hover:bg-indigo-400 text-base font-semibold shadow-lg transition"
             >
               Add Property
