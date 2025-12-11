@@ -233,17 +233,16 @@ const EditProperty: React.FC = () => {
             Edit Property
           </h1>
 
+
           {/* Error Banner */}
-          <div className="mb-6">
-            <p className="text-sm text-zinc-300 mb-2">Error Banner</p>
-            <div className="bg-zinc-800 rounded-2xl px-4 py-3 min-h-[48px] flex items-center text-sm text-red-300">
-              {form.error ? (
-                form.error
-              ) : (
-                <span className="text-zinc-500">No errors.</span>
-              )}
+          {form.error && (
+            <div className="mb-6">
+              <p className="text-sm text-zinc-300 mb-2">Error Banner</p>
+              <div className="bg-zinc-800 rounded-2xl px-4 py-3 min-h-[48px] flex items-center text-sm text-red-300">
+                {form.error}
+              </div>
             </div>
-          </div>
+          )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
