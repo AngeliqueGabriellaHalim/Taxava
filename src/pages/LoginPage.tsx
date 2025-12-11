@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import seedUsers from "../db/users.json";
+import { Baseline, Mail, Lock } from "lucide-react";
 
 type LoginMode = "email" | "username";
 
@@ -97,7 +98,7 @@ const LoginPage: React.FC = () => {
     <div className="relative w-full h-screen flex items-center justify-start overflow-hidden">
       {/* Background Image */}
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center brightness-75"
         style={{
           backgroundImage:
             "url('https://awsimages.detik.net.id/community/media/visual/2019/02/20/403af26a-f60a-491e-a4df-87e6570802bb_169.jpeg?w=1200')",
@@ -105,68 +106,84 @@ const LoginPage: React.FC = () => {
       ></div>
 
       {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-violet-900/40 to-transparent"></div>
+      <div className="absolute inset-0 bg-linear-to-r/oklch from-[#06012F]/87 from-30% via-transparent via-65% to-lightgray/20"></div>
 
       {/* Noise layer */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
 
-      {/* Logo */}
-      <div className="absolute top-6 right-8 text-xl tracking-[0.3em] font-semibold text-white">
+      <div
+        className="absolute top-10 right-16 text-3xl tracking-[0.3em] font-semibold text-white"
+        style={{ textShadow: "0 0 20px #06012F" }}
+      >
         TAXAVA
       </div>
-
       {/* Login Card */}
-      <div className="relative z-10 w-[540px] max-w-[92%] p-14 text-white ml-24">
-        <h1 className="text-4xl font-bold leading-tight mb-8">
+      <div className="relative z-10 min-w-[540px] max-w-[92%] p-14 flex flex-col gap-y-6 text-white ml-24">
+        <h1 className="text-6xl font-bold leading-tight mb-8">
           Log in <br />
-          <span className="text-violet-400">to your account.</span>
+          <div className="flex flex-row">
+            <span>to your account </span>
+            <div className="w-4 h-4  ml-2 mb-2 rounded-full bg-[#7C3AED] self-end" />
+          </div>
         </h1>
 
-        <form onSubmit={handleLogin} className="space-y-4">
-          {/* Identifier field (email/username) */}
-          <input
-            type={mode === "email" ? "email" : "text"}
-            placeholder={placeholderText}
-            value={identifier}
-            onChange={(e) => setIdentifier(e.target.value)}
-            required
-            className="w-full p-3 rounded-xl bg-white/20 placeholder-gray-300 text-white outline-none backdrop-blur-md"
-          />
+        <form
+          onSubmit={handleLogin}
+          className="space-y-4 flex gap-y-2 flex-col"
+        >
+          <div className="relative w-full">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-200 z-100">
+              {mode === "email" ? <Mail size={24} /> : <Baseline size={24} />}
+            </div>
 
+            {/* identifier field (email/username) */}
+            <input
+              type={mode === "email" ? "email" : "text"}
+              placeholder={placeholderText}
+              value={identifier}
+              onChange={(e) => setIdentifier(e.target.value)}
+              required
+              className="w-full p-4 rounded-xl bg-white/20 placeholder-gray-300 text-white text-lg outline-none backdrop-blur-md pl-14"
+            />
+          </div>
           {/* Password field */}
-          <input
-            type="password"
-            placeholder="Enter your password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="w-full p-3 rounded-xl bg-white/20 placeholder-gray-300 text-white outline-none backdrop-blur-md"
-          />
-
+          <div className="relative w-full">
+            <div className="absolute z-100 left-4 top-1/2 -translate-y-1/2 text-gray-200">
+              <Lock size={24} />
+            </div>
+            <input
+              type="password"
+              placeholder="Enter your password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full p-4 rounded-xl bg-white/20 placeholder-gray-300 text-white outline-none backdrop-blur-md text-lg pl-14"
+            />
+          </div>
           {/* Forgot password */}
-          <p className="text-sm">
+          <p className="text-m">
             Forgot password?{" "}
             <Link
               to="/forgotPassword"
-              className="text-indigo-400 underline cursor-pointer"
+              className="text-[#a77bf2] hover:underline cursor-pointer"
             >
               Click here
             </Link>
           </p>
 
           {/* Buttons */}
-          <div className="flex gap-3 pt-2">
+          <div className="flex gap-6 pt-2">
             <button
               type="button"
               onClick={toggleMode}
-              className="flex-1 h-12 rounded-full bg-neutral-700 text-sm font-semibold hover:bg-neutral-600 active:translate-y-[1px] transition cursor-pointer"
+              className="flex-1 h-12 rounded-full bg-neutral-700 text-m font-semibold hover:bg-neutral-600  transition cursor-pointer"
             >
               {toggleButtonText}
             </button>
 
             <button
               type="submit"
-              className="flex-1 h-12 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg hover:opacity-95 active:translate-y-[1px] transition cursor-pointer"
+              className="flex-1 h-12 rounded-full  bg-linear-to-r from-[#7C3AED] to-indigo-900 text-m font-semibold shadow-lg hover:opacity-75  transition cursor-pointer"
             >
               Log In
             </button>
@@ -176,7 +193,7 @@ const LoginPage: React.FC = () => {
           <div className="flex justify-center pt-4">
             <Link
               to="/createaccount"
-              className="text-indigo-300 hover:underline"
+              className="text-[#a77bf2] hover:underline"
             >
               I'm new to TAXAVA.
             </Link>
