@@ -41,7 +41,7 @@ const ManageCompanies: React.FC = () => {
   }, [userCompanies, search, sortAsc]);
 
   const handleEdit = (id: number) => {
-    navigate(`/companies/${id}/edit`);
+    navigate(`/edit-company/${id}`);
   };
 
   const handleAdd = () => {
