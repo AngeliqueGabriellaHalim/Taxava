@@ -27,7 +27,7 @@ export function loadAllProperties(): Property[] {
   const localProps: Property[] = localRaw ? JSON.parse(localRaw) : [];
   const seedProps = propertiesJson as Property[];
 
-  // Gabungkan seed + local dalam urutan (seed dulu, lalu local)
+  // gabungkan seed + local dalam urutan (seed dulu, lalu local)
   const allProps = [...seedProps, ...localProps];
 
   // Buat map, yang terakhir akan menimpa yang sebelumnya

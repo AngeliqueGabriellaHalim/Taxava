@@ -151,7 +151,7 @@ const CompanySetup: React.FC = () => {
     setOwnerEmail("");
   };
 
-  // Finish set up (PERBAIKAN NAVIGASI DI SINI)
+  // Finish set up
   const handleFinishSetup = () => {
     const currentUser = getCurrentUser();
     if (!currentUser) {
@@ -225,8 +225,8 @@ const CompanySetup: React.FC = () => {
                 placeholder="Enter package return address"
                 disabled={sameAddress}
                 className={`w-full p-3 rounded-lg ${sameAddress
-                    ? "bg-neutral-700 cursor-not-allowed"
-                    : "bg-neutral-800"
+                  ? "bg-neutral-700 cursor-not-allowed"
+                  : "bg-neutral-800"
                   }`}
               />
 
@@ -270,7 +270,7 @@ const CompanySetup: React.FC = () => {
             </button>
 
             <Link
-              to="/home"
+              to="/onboardingdb"
               className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
             >
               Cancel

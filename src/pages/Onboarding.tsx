@@ -68,15 +68,15 @@ const Onboarding: React.FC = () => {
   // State untuk menyimpan status setup
   const [setupStatus, setSetupStatus] = useState({ hasCompany: false, hasProperty: false });
 
-  // State langkah saat ini
+  // ttate langkah saat ini
   const [currentStep, setCurrentStep] = useState(0);
 
-  // --- Redirect jika belum login ---
+  // --- handleer untuk direct jika belum login ---
   if (!currentUser) {
     return <Navigate to="/login" replace />;
   }
 
-  // Periksa status Onboarding di luar useEffect untuk redirect segera
+  // periksa status Onboarding di luar useEffect untuk redirect segera
   if (currentUser.hasOnboarded) {
     return <Navigate to="/home" replace />;
   }
@@ -114,12 +114,12 @@ const Onboarding: React.FC = () => {
 
 
   const updateCurrentUserOnboardStatus = () => {
-    // Pengamanan final: Hanya izinkan jika status menunjukkan COMPLETE
+    //  jika status menunjukkan COMPLETE
     if (currentStep !== 2) {
       return;
     }
 
-    // 1. Perbarui user di local storage 'users'
+    // perbarui user di local storage 'users'
     const localUsers = loadUsers();
     const updatedLocalUsers = localUsers.map((u) => {
       if (u.id === currentUser.id) {
@@ -210,7 +210,7 @@ const Onboarding: React.FC = () => {
               buttonLabel = "View";
             }
 
-            // atur disabled:
+            // step by step disabled:
             // langkah 1: Tidak disabled (selalu bisa Get Started atau View)
             // langkah 2: Disabled jika Company belum selesai (currentStep < 1)
             // langkah 3: Disabled jika Company/Property belum selesai (currentStep < 2)

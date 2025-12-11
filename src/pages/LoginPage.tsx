@@ -35,7 +35,7 @@ const LoginPage: React.FC = () => {
 
   const loadUsers = (): User[] => {
     const data = localStorage.getItem("users");
-    // Pastikan data dari localStorage memiliki properti hasOnboarded
+    // pastikan data dari localStorage memiliki properti hasOnboarded
     return data ? JSON.parse(data) : [];
   };
 
@@ -44,7 +44,8 @@ const LoginPage: React.FC = () => {
 
     const localUsers = loadUsers();
 
-    // Gabungkan user local dan seed users. Beri nilai default hasOnboarded: false
+    // gabungkan user local dan seed users
+    // nilai default hasOnboarded: false
     const allUsers: User[] = [
       ...localUsers,
       ...(seedUsers as User[]).map((u) => ({
@@ -77,9 +78,9 @@ const LoginPage: React.FC = () => {
     toast.success(`Welcome back, ${user.username}!`);
 
     if (user.hasOnboarded) {
-      navigate("/home"); // Sudah onboarding, langsung ke home
+      navigate("/home"); // sudah onboarding, langsung ke home
     } else {
-      navigate("/onboardingdb"); // Belum onboarding, ke halaman onboarding
+      navigate("/onboardingdb"); // belum onboarding, ke halaman onboarding
     }
   };
 
