@@ -113,33 +113,46 @@ const CreateAccount: React.FC = () => {
   return (
     <div className="min-h-screen bg-neutral-900 text-white grid grid-cols-2 relative">
       <div
-        className="absolute inset-0 bg-cover bg-center"
+        className="absolute inset-0 bg-cover bg-center brightness-75"
         style={{
           backgroundImage:
             "url('https://awsimages.detik.net.id/community/media/visual/2019/02/20/403af26a-f60a-491e-a4df-87e6570802bb_169.jpeg?w=1200')",
         }}
       ></div>
-      <div className="absolute inset-0 bg-gradient-to-br from-black/70 via-violet-900/40 to-transparent"></div>
+      {/* Gradient Overlay */}
+      <div className="absolute inset-0 bg-linear-to-r/oklch from-lightgray/25 from-10% to-[#06012F]/90"></div>
+
+      {/* Noise layer */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
 
-      <div className="absolute top-6 left-8 text-xl tracking-[0.3em] font-semibold">
+      <div
+        className="absolute top-10 left-16 text-3xl tracking-[0.3em] font-semibold text-white"
+        style={{ textShadow: "0 0 20px #06012F" }}
+      >
         TAXAVA
       </div>
       <div className="relative flex items-center justify-center"></div>
 
       <div className="flex items-center justify-center pr-16 relative">
         {/* CARD */}
-        <div className="bg-neutral-900/80 rounded-3xl shadow-2xl px-10 py-10 max-w-md w-full">
-          <h1 className="text-4xl font-bold leading-tight mb-1">
-            Create a new <br />
-            <span>Account</span>
+        <div className="rounded-3xl py-10 max-w-md w-full">
+          <h1 className="text-6xl font-bold leading-tight mb-8">
+            Create an <br />
+            <div className="flex flex-row">
+              <span>Account </span>
+              <div className="w-4 h-4  ml-3 mb-2 rounded-full bg-[#7C3AED] self-end" />
+            </div>
           </h1>
-
           <div className="h-6" />
 
           <form onSubmit={handleSubmit} className="space-y-4">
-            <div className="flex items-center bg-white/10 rounded-full px-4 h-11">
-              <User className="w-4 h-4 mr-3 text-neutral-100" />
+            {/* Username */}
+            <div
+              className="flex items-center w-full h-14 rounded-2xl 
+                  bg-white/20 backdrop-blur-sm 
+                  px-5 space-x-4 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            >
+              <User className="w-6 h-6 text-neutral-200" />
               <input
                 type="text"
                 name="username"
@@ -147,12 +160,16 @@ const CreateAccount: React.FC = () => {
                 value={form.username}
                 onChange={handleChange}
                 required
-                className="flex-1 bg-transparent outline-none text-sm placeholder:text-neutral-300"
+                className="flex-1 bg-transparent outline-none text-base placeholder-neutral-300"
               />
             </div>
 
-            <div className="flex items-center bg-white/10 rounded-full px-4 h-11">
-              <Mail className="w-4 h-4 mr-3 text-neutral-100" />
+            <div
+              className="flex items-center w-full h-14 rounded-2xl 
+                bg-white/20 backdrop-blur-sm 
+                px-5 space-x-4 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            >
+              <Mail className="w-6 h-6 text-neutral-200" />
               <input
                 type="email"
                 name="email"
@@ -160,12 +177,16 @@ const CreateAccount: React.FC = () => {
                 value={form.email}
                 onChange={handleChange}
                 required
-                className="flex-1 bg-transparent outline-none text-sm placeholder:text-neutral-300"
+                className="flex-1 bg-transparent outline-none text-base placeholder-neutral-300"
               />
             </div>
 
-            <div className="flex items-center bg-white/10 rounded-full px-4 h-11">
-              <Lock className="w-4 h-4 mr-3 text-neutral-100" />
+            <div
+              className="flex items-center w-full h-14 rounded-2xl 
+                bg-white/20 backdrop-blur-sm 
+                px-5 space-x-4 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            >
+              <Lock className="w-6 h-6 text-neutral-200" />
               <input
                 type="password"
                 name="password"
@@ -173,12 +194,17 @@ const CreateAccount: React.FC = () => {
                 value={form.password}
                 onChange={handleChange}
                 required
-                className="flex-1 bg-transparent outline-none text-sm placeholder:text-neutral-300"
+                className="flex-1 bg-transparent outline-none text-base placeholder-neutral-300"
               />
             </div>
 
-            <div className="flex items-center bg-white/10 rounded-full px-4 h-11">
-              <Lock className="w-4 h-4 mr-3 text-neutral-100" />
+            {/* Confirm Password */}
+            <div
+              className="flex items-center w-full h-14 rounded-2xl 
+                  bg-white/20 backdrop-blur-sm 
+                  px-5 space-x-4 shadow-[0_4px_20px_rgba(0,0,0,0.2)]"
+            >
+              <Lock className="w-6 h-6 text-neutral-200" />
               <input
                 type="password"
                 name="passwordConfirm"
@@ -186,19 +212,20 @@ const CreateAccount: React.FC = () => {
                 value={form.passwordConfirm}
                 onChange={handleChange}
                 required
-                className="flex-1 bg-transparent outline-none text-sm placeholder:text-neutral-300"
+                autoComplete="new-password"
+                className="flex-1 bg-transparent outline-none text-base placeholder-neutral-300"
               />
             </div>
 
             <button
               type="submit"
-              className="mt-2 w-full h-11 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg hover:opacity-95 active:translate-y-[1px] transition"
+              className="mt-2 w-full h-11 rounded-full bg-linear-to-r from-indigo-600 to-[#7C3AED] text-m font-semibold shadow-lg hover:opacity-75  transition cursor-pointer"
             >
               Create Account
             </button>
           </form>
           <div className="flex justify-center pt-4">
-            <Link to="/login" className="text-indigo-300 hover:underline">
+            <Link to="/login" className="text-[#a77bf2] hover:underline">
               I already have an account.
             </Link>
           </div>

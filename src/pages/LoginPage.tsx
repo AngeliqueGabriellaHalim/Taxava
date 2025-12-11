@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import seedUsers from "../db/users.json";
-import { Baseline, Mail, Lock } from "lucide-react";
+import { Baseline, Mail, Lock, User } from "lucide-react";
 
 type LoginMode = "email" | "username";
 
@@ -133,7 +133,7 @@ const LoginPage: React.FC = () => {
         >
           <div className="relative w-full">
             <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-100 z-100">
-              {mode === "email" ? <Mail size={24} /> : <Baseline size={24} />}
+              {mode === "email" ? <Mail size={24} /> : <User size={24} />}
             </div>
 
             {/* identifier field (email/username) */}
