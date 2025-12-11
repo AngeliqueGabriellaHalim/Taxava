@@ -106,7 +106,7 @@ const LoginPage: React.FC = () => {
       ></div>
 
       {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-linear-to-r/oklch from-[#06012F]/87 from-30% via-transparent via-65% to-lightgray/20"></div>
+      <div className="absolute inset-0 bg-linear-to-r/oklch from-[#06012F]/87 from-35% via-transparent via-65% to-lightgray/20"></div>
 
       {/* Noise layer */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
@@ -132,7 +132,7 @@ const LoginPage: React.FC = () => {
           className="space-y-4 flex gap-y-2 flex-col"
         >
           <div className="relative w-full">
-            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-200 z-100">
+            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-100 z-100">
               {mode === "email" ? <Mail size={24} /> : <Baseline size={24} />}
             </div>
 
@@ -142,13 +142,14 @@ const LoginPage: React.FC = () => {
               placeholder={placeholderText}
               value={identifier}
               onChange={(e) => setIdentifier(e.target.value)}
+              autoComplete="username"
               required
               className="w-full p-4 rounded-xl bg-white/20 placeholder-gray-300 text-white text-lg outline-none backdrop-blur-md pl-14"
             />
           </div>
           {/* Password field */}
           <div className="relative w-full">
-            <div className="absolute z-100 left-4 top-1/2 -translate-y-1/2 text-gray-200">
+            <div className="absolute z-100 left-4 top-1/2 -translate-y-1/2 text-gray-100">
               <Lock size={24} />
             </div>
             <input
@@ -156,6 +157,7 @@ const LoginPage: React.FC = () => {
               placeholder="Enter your password"
               value={password}
               onChange={(e) => setPassword(e.target.value)}
+              autoComplete="current-password"
               required
               className="w-full p-4 rounded-xl bg-white/20 placeholder-gray-300 text-white outline-none backdrop-blur-md text-lg pl-14"
             />
