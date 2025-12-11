@@ -72,7 +72,6 @@ const EditCompany: React.FC = () => {
 
   const [loading, setLoading] = useState(true);
   // initialCompany akan menyimpan detail perusahaan yang dimuat versi LS atau JSON
-  // nanti bakal update lagi bagian ini
   const [initialCompany, setInitialCompany] = useState<Company | null>(null);
 
   // efek untuk memuat dan mengisi data perusahaan saat komponen dimuat
@@ -171,7 +170,7 @@ const EditCompany: React.FC = () => {
     navigate("/manage-companies");
   };
 
-  // --- Logika Pembatalan (CANCEL) ---
+  // --- Logika Pembatalan ---
   const handleCancel = () => {
     navigate("/manage-companies");
   };
