@@ -2,28 +2,9 @@ import React, { useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../component/Navbar";
 import { toast } from "react-toastify";
-import INITIAL_COMPANIES_DATA from "../db/company.json";
-
-// Interfaces
-interface Company {
-  id: number;
-  name: string;
-  phone: string;
-  mailingAddress: string;
-  returnAddress: string;
-  sameAddress: boolean;
-  ownerName: string;
-  ownerEmail: string;
-  userId: number;
-}
-
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  password?: string;
-  hasOnboarded: boolean;
-}
+import { getCurrentUser } from "../utils/getUser";
+import { loadAllCompanies, saveCompaniesToLocal } from "../utils/getCompany";
+import type { Company } from "../utils/getCompany";
 
 const CompanySetup: React.FC = () => {
   const navigate = useNavigate();
@@ -34,33 +15,11 @@ const CompanySetup: React.FC = () => {
   const [mailingAddress, setMailingAddress] = useState("");
   const [returnAddress, setReturnAddress] = useState("");
   const [sameAddress, setSameAddress] = useState(false);
-
   const [ownerName, setOwnerName] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
+  const [errorBanner, setErrorBanner] = useState("");
 
-  // Utility Functions
-  const getCurrentUser = (): User | null => {
-    const userStr = localStorage.getItem("currentUser");
-    return userStr ? JSON.parse(userStr) : null;
-  };
-
-  const loadLocalCompanies = (): Company[] => {
-    const data = localStorage.getItem("companies");
-    return data ? JSON.parse(data) : [];
-  };
-
-  const loadCompaniesForIdCheck = (): Company[] => {
-    const localCompanies = loadLocalCompanies();
-    const initialData = INITIAL_COMPANIES_DATA as Company[];
-    return [...localCompanies, ...initialData];
-  };
-
-  const saveCompanies = (companies: Company[]) => {
-    localStorage.setItem("companies", JSON.stringify(companies));
-  };
-
-  // Handler Checkbox & Input
-
+  // Handlers
   const handleSameAddress = () => {
     const checked = !sameAddress;
     setSameAddress(checked);
@@ -72,58 +31,44 @@ const CompanySetup: React.FC = () => {
     if (sameAddress) setReturnAddress(value);
   };
 
-  // Validasi dan Logika Penyimpanan
-
+  // Validasi (Error pakai banner, Sukses pakai toast)
   const validateData = useCallback(() => {
-    if (
-      !companyName ||
-      !companyNumber ||
-      !mailingAddress ||
-      !returnAddress ||
-      !ownerName ||
-      !ownerEmail
-    ) {
-      toast.error("Please fill all fields.");
+    setErrorBanner("");
+
+    if (!companyName || !companyNumber || !mailingAddress || !returnAddress || !ownerName || !ownerEmail) {
+      setErrorBanner("Please fill all required fields.");
       return false;
     }
 
     if (!/^[0-9]+$/.test(companyNumber)) {
-      toast.error("Company number must contain numbers only.");
+      setErrorBanner("Company number must contain numbers only.");
       return false;
     }
 
-    if (!/^\S+@\S+\.com$/.test(ownerEmail)) {
-      toast.error("Email must be a valid address ending with .com.");
+    // Regex email umum (tanpa paksaan .com)
+    if (!/^\S+@\S+\.\S+$/.test(ownerEmail)) {
+      setErrorBanner("Please enter a valid email address.");
       return false;
     }
     return true;
-  }, [
-    companyName,
-    companyNumber,
-    mailingAddress,
-    returnAddress,
-    ownerName,
-    ownerEmail,
-  ]);
+  }, [companyName, companyNumber, mailingAddress, returnAddress, ownerName, ownerEmail]);
 
   const handleAddCompany = () => {
     if (!validateData()) return;
 
     const currentUser = getCurrentUser();
     if (!currentUser) {
-      toast.error("User not logged in. Please log in first.");
+      setErrorBanner("User not logged in. Please log in first.");
       return;
     }
 
-    const allCompaniesForIdCheck = loadCompaniesForIdCheck();
-    const maxId =
-      allCompaniesForIdCheck.length > 0
-        ? Math.max(...allCompaniesForIdCheck.map((c) => c.id))
-        : 0;
-    const newId = maxId + 1;
+    const allCompanies = loadAllCompanies();
+    const maxId = allCompanies.length > 0
+      ? Math.max(...allCompanies.map((c: Company) => c.id))
+      : 0;
 
     const newCompany: Company = {
-      id: newId,
+      id: maxId + 1,
       name: companyName,
       phone: companyNumber,
       mailingAddress: mailingAddress,
@@ -134,11 +79,12 @@ const CompanySetup: React.FC = () => {
       userId: currentUser.id,
     };
 
-    const currentLocalCompanies = loadLocalCompanies();
-    const updatedCompanies = [...currentLocalCompanies, newCompany];
+    const localRaw = localStorage.getItem("companies");
+    const currentLocal: Company[] = localRaw ? JSON.parse(localRaw) : [];
 
-    saveCompanies(updatedCompanies);
+    saveCompaniesToLocal([...currentLocal, newCompany]);
 
+    // Toast untuk Sukses
     toast.success(`Company '${companyName}' added successfully!`);
 
     // Reset state
@@ -149,18 +95,7 @@ const CompanySetup: React.FC = () => {
     setSameAddress(false);
     setOwnerName("");
     setOwnerEmail("");
-  };
-
-  // Finish set up
-  const handleFinishSetup = () => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-      toast.error("Please log in again.");
-      return;
-    }
-
-    // Navigasi kembali ke Onboarding agar status di-refresh
-    navigate("/onboarding", { replace: true });
+    setErrorBanner("");
   };
 
   return (
@@ -183,6 +118,13 @@ const CompanySetup: React.FC = () => {
               Add Company
             </button>
           </div>
+
+          {/* Error Banner */}
+          {errorBanner && (
+            <div className="bg-red-700/50 p-3 rounded-lg mb-8 text-sm text-white font-semibold">
+              {errorBanner}
+            </div>
+          )}
 
           {/* grid 2 kolom */}
           <div className="grid grid-cols-2 gap-x-10 mb-20">
@@ -263,14 +205,14 @@ const CompanySetup: React.FC = () => {
           {/* buttons bawah */}
           <div className="flex justify-center gap-8">
             <button
-              onClick={handleFinishSetup}
+              onClick={() => navigate("/onboarding", { replace: true })}
               className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
             >
               Finish Set Up
             </button>
 
             <Link
-              to="/onboardingdb"
+              to="/onboarding"
               className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
             >
               Cancel
