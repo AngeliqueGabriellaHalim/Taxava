@@ -12,18 +12,22 @@ export interface Company {
   userId: number;
 }
 
+export function loadAllCompanies(): Company[] {
+  const localRaw = localStorage.getItem("companies");
+  const local: Company[] = localRaw ? JSON.parse(localRaw) : [];
+  const seed = companiesJson as Company[];
+
+  const map = new Map<number, Company>();
+  seed.forEach((c) => map.set(c.id, c));
+  local.forEach((c) => map.set(c.id, c));
+
+  return Array.from(map.values());
+}
+
+export function saveCompaniesToLocal(companies: Company[]) {
+  localStorage.setItem("companies", JSON.stringify(companies));
+}
+
 export function getCompaniesByUser(userId: number): Company[] {
-  // local storage first
-  const local = (() => {
-    try {
-      const raw = localStorage.getItem("companies");
-      return raw ? (JSON.parse(raw) as Company[]) : [];
-    } catch {
-      return [];
-    }
-  })();
-
-  const merged: Company[] = [...(companiesJson as Company[]), ...local];
-
-  return merged.filter((c) => c.userId === userId);
+  return loadAllCompanies().filter((c) => c.userId === userId);
 }

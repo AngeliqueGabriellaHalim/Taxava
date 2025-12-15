@@ -54,7 +54,7 @@ const Onboarding: React.FC = () => {
   const handleFinishOnboarding = () => {
     if (currentStep !== 2) return;
 
-    // SOLUSI: Ambil semua user (JSON + Local), update yang sedang login, simpan kembali ke Local
+    // ambil semua user (JSON + Local), update yang sedang login, simpan kembali ke Local
     const allUsers = loadAllUsers();
     const updatedUsers = allUsers.map((u) =>
       u.id === currentUser.id ? { ...u, hasOnboarded: true } : u

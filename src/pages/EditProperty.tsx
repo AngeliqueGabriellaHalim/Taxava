@@ -128,14 +128,14 @@ const EditProperty: React.FC = () => {
 
   const handleChange =
     (field: keyof FormState) =>
-    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const value = e.target.value;
-      setForm((prev) => ({
-        ...prev,
-        [field]: value,
-        error: "",
-      }));
-    };
+      (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+        const value = e.target.value;
+        setForm((prev) => ({
+          ...prev,
+          [field]: value,
+          error: "",
+        }));
+      };
 
   const handleCheckbox =
     (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
