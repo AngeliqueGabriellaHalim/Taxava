@@ -34,11 +34,11 @@ const CompanySetup: React.FC = () => {
   const [mailingAddress, setMailingAddress] = useState("");
   const [returnAddress, setReturnAddress] = useState("");
   const [sameAddress, setSameAddress] = useState(false);
-
   const [ownerName, setOwnerName] = useState("");
   const [ownerEmail, setOwnerEmail] = useState("");
+  const [errorBanner, setErrorBanner] = useState("");
 
-  // Utility Functions
+  // utils
   const getCurrentUser = (): User | null => {
     const userStr = localStorage.getItem("currentUser");
     return userStr ? JSON.parse(userStr) : null;
@@ -59,8 +59,7 @@ const CompanySetup: React.FC = () => {
     localStorage.setItem("companies", JSON.stringify(companies));
   };
 
-  // Handler Checkbox & Input
-
+  // Handlers
   const handleSameAddress = () => {
     const checked = !sameAddress;
     setSameAddress(checked);
@@ -72,9 +71,10 @@ const CompanySetup: React.FC = () => {
     if (sameAddress) setReturnAddress(value);
   };
 
-  // Validasi dan Logika Penyimpanan
-
+  // validasi
   const validateData = useCallback(() => {
+    setErrorBanner("");
+
     if (
       !companyName ||
       !companyNumber ||
@@ -83,28 +83,27 @@ const CompanySetup: React.FC = () => {
       !ownerName ||
       !ownerEmail
     ) {
-      toast.error("Please fill all fields.");
+      const msg = "Please fill all required fields.";
+      setErrorBanner(msg);
+      toast.error(msg);
       return false;
     }
 
     if (!/^[0-9]+$/.test(companyNumber)) {
-      toast.error("Company number must contain numbers only.");
+      const msg = "Company number must contain numbers only.";
+      setErrorBanner(msg);
+      toast.error(msg);
       return false;
     }
 
-    if (!/^\S+@\S+\.com$/.test(ownerEmail)) {
-      toast.error("Email must be a valid address ending with .com.");
+    if (!/^\S+@\S+\.\S+$/.test(ownerEmail)) {
+      const msg = "Please enter a valid email address.";
+      setErrorBanner(msg);
+      toast.error(msg);
       return false;
     }
     return true;
-  }, [
-    companyName,
-    companyNumber,
-    mailingAddress,
-    returnAddress,
-    ownerName,
-    ownerEmail,
-  ]);
+  }, [companyName, companyNumber, mailingAddress, returnAddress, ownerName, ownerEmail]);
 
   const handleAddCompany = () => {
     if (!validateData()) return;
@@ -116,14 +115,12 @@ const CompanySetup: React.FC = () => {
     }
 
     const allCompaniesForIdCheck = loadCompaniesForIdCheck();
-    const maxId =
-      allCompaniesForIdCheck.length > 0
-        ? Math.max(...allCompaniesForIdCheck.map((c) => c.id))
-        : 0;
-    const newId = maxId + 1;
+    const maxId = allCompaniesForIdCheck.length > 0
+      ? Math.max(...allCompaniesForIdCheck.map((c: Company) => c.id))
+      : 0;
 
     const newCompany: Company = {
-      id: newId,
+      id: maxId + 1,
       name: companyName,
       phone: companyNumber,
       mailingAddress: mailingAddress,
@@ -135,13 +132,11 @@ const CompanySetup: React.FC = () => {
     };
 
     const currentLocalCompanies = loadLocalCompanies();
-    const updatedCompanies = [...currentLocalCompanies, newCompany];
-
-    saveCompanies(updatedCompanies);
+    saveCompanies([...currentLocalCompanies, newCompany]);
 
     toast.success(`Company '${companyName}' added successfully!`);
 
-    // Reset state
+    // reset state
     setCompanyName("");
     setCompanyNumber("");
     setMailingAddress("");
@@ -151,31 +146,14 @@ const CompanySetup: React.FC = () => {
     setOwnerEmail("");
   };
 
-  // Finish set up
-  const handleFinishSetup = () => {
-    const currentUser = getCurrentUser();
-    if (!currentUser) {
-      toast.error("Please log in again.");
-      return;
-    }
-
-    // Navigasi kembali ke Onboarding agar status di-refresh
-    navigate("/onboarding", { replace: true });
-  };
-
   return (
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
-      {/* navbar */}
       <Navbar />
       <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
-        {/* card utama */}
         <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10">
-          {/* header */}
           <div className="flex justify-between items-center mb-12">
             <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
-
             <h1 className="text-3xl font-bold">Company Setup</h1>
-
             <button
               onClick={handleAddCompany}
               className="bg-violet-500 px-5 py-2 rounded-full text-sm font-semibold shadow-lg hover:opacity-90"
@@ -184,13 +162,15 @@ const CompanySetup: React.FC = () => {
             </button>
           </div>
 
-          {/* grid 2 kolom */}
+          {errorBanner && (
+            <div className="bg-red-700/50 p-3 rounded-lg mb-8 text-sm text-white font-semibold">
+              {errorBanner}
+            </div>
+          )}
+
           <div className="grid grid-cols-2 gap-x-10 mb-20">
-            {/* company Name full width */}
             <div className="col-span-2 mb-8">
-              <label className="block mb-2 font-semibold">
-                Enter company name
-              </label>
+              <label className="block mb-2 font-semibold">Enter company name</label>
               <input
                 type="text"
                 value={companyName}
@@ -200,7 +180,6 @@ const CompanySetup: React.FC = () => {
               />
             </div>
 
-            {/* kiri */}
             <div className="flex flex-col gap-6">
               <input
                 type="text"
@@ -209,7 +188,6 @@ const CompanySetup: React.FC = () => {
                 placeholder="Enter company number"
                 className="bg-neutral-800 w-full p-3 rounded-lg"
               />
-
               <input
                 type="text"
                 value={mailingAddress}
@@ -217,30 +195,23 @@ const CompanySetup: React.FC = () => {
                 placeholder="Enter mailing address"
                 className="bg-neutral-800 w-full p-3 rounded-lg"
               />
-
-              <input
-                type="text"
-                value={returnAddress}
-                onChange={(e) => setReturnAddress(e.target.value)}
-                placeholder="Enter package return address"
-                disabled={sameAddress}
-                className={`w-full p-3 rounded-lg ${sameAddress
-                  ? "bg-neutral-700 cursor-not-allowed"
-                  : "bg-neutral-800"
-                  }`}
-              />
-
-              <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
+              <div>
                 <input
-                  type="checkbox"
-                  checked={sameAddress}
-                  onChange={handleSameAddress}
+                  type="text"
+                  value={returnAddress}
+                  onChange={(e) => setReturnAddress(e.target.value)}
+                  placeholder="Enter package return address"
+                  disabled={sameAddress}
+                  className={`w-full p-3 rounded-lg ${sameAddress ? "bg-neutral-700 cursor-not-allowed" : "bg-neutral-800"
+                    }`}
                 />
-                Same as mailing address
-              </label>
+                <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
+                  <input type="checkbox" checked={sameAddress} onChange={handleSameAddress} />
+                  Same as mailing address
+                </label>
+              </div>
             </div>
 
-            {/* kanan */}
             <div className="flex flex-col gap-6">
               <input
                 type="text"
@@ -249,7 +220,6 @@ const CompanySetup: React.FC = () => {
                 placeholder="Enter owner's name"
                 className="bg-neutral-800 w-full p-3 rounded-lg"
               />
-
               <input
                 type="email"
                 value={ownerEmail}
@@ -260,17 +230,15 @@ const CompanySetup: React.FC = () => {
             </div>
           </div>
 
-          {/* buttons bawah */}
           <div className="flex justify-center gap-8">
             <button
-              onClick={handleFinishSetup}
+              onClick={() => navigate("/onboarding", { replace: true })}
               className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
             >
               Finish Set Up
             </button>
-
             <Link
-              to="/onboardingdb"
+              to="/onboarding"
               className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
             >
               Cancel
