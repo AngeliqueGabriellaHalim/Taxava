@@ -4,8 +4,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import initialCompaniesData from "../db/company.json";
 
-
-// --- Interfaces ---
+// Interfaces
 
 interface Company {
   id: number;
@@ -22,7 +21,7 @@ interface Company {
 const loadLocalCompanies = (): Company[] => {
   try {
     const data = localStorage.getItem("companies");
-    return data ? JSON.parse(data) as Company[] : [];
+    return data ? (JSON.parse(data) as Company[]) : [];
   } catch (e) {
     console.error("Error loading local companies:", e);
     return [];
@@ -36,31 +35,28 @@ const loadAllCompanies = (): Company[] => {
   const companyMap = new Map<number, Company>();
 
   // data JSON
-  initialData.forEach(company => {
+  initialData.forEach((company) => {
     companyMap.set(company.id, company);
   });
 
   // data Local Storage
-  localCompanies.forEach(company => {
+  localCompanies.forEach((company) => {
     companyMap.set(company.id, company);
   });
 
   return Array.from(companyMap.values());
 };
 
-
-
 const saveCompanies = (companies: Company[]) => {
   localStorage.setItem("companies", JSON.stringify(companies));
 };
-
 
 const EditCompany: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const companyId = id ? parseInt(id) : null;
   const navigate = useNavigate();
 
-  // --- State Input ---
+  // State Input
   const [companyName, setCompanyName] = useState("");
   const [companyNumber, setCompanyNumber] = useState("");
   const [mailingAddress, setMailingAddress] = useState("");
@@ -84,7 +80,7 @@ const EditCompany: React.FC = () => {
 
     // Ambil semua data
     const allCompanies = loadAllCompanies();
-    const foundCompany = allCompanies.find(c => c.id === companyId);
+    const foundCompany = allCompanies.find((c) => c.id === companyId);
 
     if (foundCompany) {
       setInitialCompany(foundCompany);
@@ -102,7 +98,7 @@ const EditCompany: React.FC = () => {
     setLoading(false);
   }, [companyId, navigate]);
 
-  // --- Handler Checkbox & Input ---
+  // Handler Checkbox & Input
   const handleSameAddress = () => {
     const checked = !sameAddress;
     setSameAddress(checked);
@@ -114,11 +110,18 @@ const EditCompany: React.FC = () => {
     if (sameAddress) setReturnAddress(value);
   };
 
-  // --- Validasi Data ---
+  // Validasi Data
   const validateData = useCallback(() => {
     setErrorBanner("");
 
-    if (!companyName || !companyNumber || !mailingAddress || !returnAddress || !ownerName || !ownerEmail) {
+    if (
+      !companyName ||
+      !companyNumber ||
+      !mailingAddress ||
+      !returnAddress ||
+      !ownerName ||
+      !ownerEmail
+    ) {
       setErrorBanner("Please fill all required fields.");
       toast.error("Please fill all required fields.");
       return false;
@@ -135,9 +138,16 @@ const EditCompany: React.FC = () => {
       return false;
     }
     return true;
-  }, [companyName, companyNumber, mailingAddress, returnAddress, ownerName, ownerEmail]);
+  }, [
+    companyName,
+    companyNumber,
+    mailingAddress,
+    returnAddress,
+    ownerName,
+    ownerEmail,
+  ]);
 
-  // --- logika penyimpanan  ---
+  // logika penyimpanan
   const handleSaveCompany = () => {
     if (!validateData() || !initialCompany) return;
 
@@ -154,7 +164,9 @@ const EditCompany: React.FC = () => {
     };
 
     const existingLocalCompanies = loadLocalCompanies();
-    const companyIndex = existingLocalCompanies.findIndex(c => c.id === updatedCompany.id);
+    const companyIndex = existingLocalCompanies.findIndex(
+      (c) => c.id === updatedCompany.id
+    );
 
     let companiesToSave: Company[];
 
@@ -170,7 +182,7 @@ const EditCompany: React.FC = () => {
     navigate("/manage-companies");
   };
 
-  // --- Logika Pembatalan ---
+  // Logika Pembatalan
   const handleCancel = () => {
     navigate("/manage-companies");
   };
@@ -203,11 +215,16 @@ const EditCompany: React.FC = () => {
             <div></div>
           </div>
 
+          {/* Error Banner */}
+          {errorBanner && (
+            <div className="bg-red-700/50 p-3 rounded-lg mb-8 text-sm text-white font-semibold">
+              {errorBanner}
+            </div>
+          )}
+
           {/* Company Name full width */}
           <div className="col-span-2 mb-6">
-            <label className="block mb-2 font-semibold">
-              Company Name
-            </label>
+            <label className="block mb-2 font-semibold">Company Name</label>
             <input
               type="text"
               value={companyName}
@@ -217,20 +234,10 @@ const EditCompany: React.FC = () => {
             />
           </div>
 
-          {/* Error Banner */}
-          {errorBanner && (
-            <div className="bg-red-700/50 p-3 rounded-lg mb-8 text-sm text-white font-semibold">
-              {errorBanner}
-            </div>
-          )}
-
           {/* grid 2 kolom */}
           <div className="grid grid-cols-2 gap-x-10 mb-10">
-
-
             {/* KIRI */}
             <div className="flex flex-col gap-6">
-
               {/* Phone Number */}
               <div>
                 <label className="block mb-2 font-semibold">Phone Number</label>
@@ -245,7 +252,9 @@ const EditCompany: React.FC = () => {
 
               {/* Mailing Address */}
               <div>
-                <label className="block mb-2 font-semibold">Mailing Address</label>
+                <label className="block mb-2 font-semibold">
+                  Mailing Address
+                </label>
                 <input
                   type="text"
                   value={mailingAddress}
@@ -257,15 +266,20 @@ const EditCompany: React.FC = () => {
 
               {/* Package Return Address & Checkbox */}
               <div>
-                <label className="block mb-2 font-semibold">Package Return Address</label>
+                <label className="block mb-2 font-semibold">
+                  Package Return Address
+                </label>
                 <input
                   type="text"
                   value={returnAddress}
                   onChange={(e) => setReturnAddress(e.target.value)}
                   placeholder="Enter package return address"
                   disabled={sameAddress}
-                  className={`w-full p-3 rounded-lg ${sameAddress ? "bg-neutral-700 cursor-not-allowed" : "bg-neutral-800"
-                    }`}
+                  className={`w-full p-3 rounded-lg ${
+                    sameAddress
+                      ? "bg-neutral-700 cursor-not-allowed"
+                      : "bg-neutral-800"
+                  }`}
                 />
                 <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
                   <input
@@ -280,7 +294,6 @@ const EditCompany: React.FC = () => {
 
             {/* KANAN */}
             <div className="flex flex-col gap-6">
-
               {/* Owner's Name */}
               <div>
                 <label className="block mb-2 font-semibold">Owner's Name</label>
@@ -295,7 +308,9 @@ const EditCompany: React.FC = () => {
 
               {/* Owner's Email */}
               <div>
-                <label className="block mb-2 font-semibold">Owner's Email</label>
+                <label className="block mb-2 font-semibold">
+                  Owner's Email
+                </label>
                 <input
                   type="email"
                   value={ownerEmail}
@@ -313,7 +328,7 @@ const EditCompany: React.FC = () => {
               type="button"
               onClick={handleSaveCompany}
               className="px-8 py-3 rounded-full font-semibold shadow-lg transition"
-              style={{ backgroundColor: '#7C3AED' }}
+              style={{ backgroundColor: "#7C3AED" }}
             >
               Save
             </button>
