@@ -5,7 +5,7 @@ import { getCompaniesByUser } from "../utils/getCompany";
 import { getPropertiesByUser } from "../utils/getProperty";
 import { getCurrentUser, loadAllUsers, saveUsersToLocal } from "../utils/getUser";
 
-const steps = [
+const steps = [                            
   { title: "Company Setup", path: "/company-setup" },
   { title: "Property Setup", path: "/property-setup" },
   { title: "You're all set !" },
@@ -13,15 +13,15 @@ const steps = [
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();
-  const currentUser = getCurrentUser();
+  const location = useLocation();  
+  const currentUser = getCurrentUser();         
 
   const [setupStatus, setSetupStatus] = useState({ hasCompany: false, hasProperty: false });
   const [currentStep, setCurrentStep] = useState(0);
 
   // Redirect jika tidak login
   if (!currentUser) return <Navigate to="/login" replace />;
-
+  
   // Redirect jika sudah onboarding
   if (currentUser.hasOnboarded) return <Navigate to="/home" replace />;
 
@@ -69,6 +69,12 @@ const Onboarding: React.FC = () => {
 
     navigate("/home", { replace: true });
   };
+  const handleSkip =()=>{
+    localStorage.removeItem("curentUser")
+     const updatedSession = { ...currentUser, hasOnboarded: true };
+    localStorage.setItem("currentUser", JSON.stringify(updatedSession));
+    navigate("/home");
+  };
 
   const handleStepAction = (index: number) => {
     if (index === 0) {
@@ -84,9 +90,9 @@ const Onboarding: React.FC = () => {
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
       <Navbar />
       <div className="min-h-screen bg-neutral-900 text-white px-6 py-10 relative">
-        <Link to="/home" className="absolute top-6 right-8 text-sm underline text-neutral-300 hover:text-white transition">
+        <p onClick={handleSkip} className="absolute top-6 right-8 text-sm underline text-neutral-300 hover:text-white transition cursor-pointer">
           I’d like to skip and <br /> go to main dashboard.
-        </Link>
+        </p>
 
         <div className="mt-20 text-center">
           <h1 className="text-4xl font-bold mb-4">Welcome to your onboarding dashboard</h1>
