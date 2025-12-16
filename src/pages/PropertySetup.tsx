@@ -109,7 +109,7 @@ const [formError, setFormError] = useState<string>("");
   (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
 
-    // ❌ If checkbox needs company but none selected
+    //if havent selected company
     if (
       checked &&
       (field === "sameAsCompany" || field === "sameAsMailing") &&
