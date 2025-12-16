@@ -1,11 +1,18 @@
-import React, { useState } from "react";
+import React, { useState, type FormEvent } from "react";
 import { Mail } from "lucide-react";
 import { useNavigate } from "react-router-dom";
-import {loadAllUsers} from "../utils/getUser";
+import { toast } from "react-toastify";
+
 const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
+  const handleSubmit=(e:FormEvent)=>{
+    e.preventDefault();
+     toast.success("If the email exists, a reset link has been sent.");
+     navigate("/checkemail")
+
+  }
   return (
     <div className="min-h-screen bg-neutral-900 text-white flex items-center justify-center px-6 relative">
       {/* Logo */}
@@ -17,7 +24,7 @@ const ForgotPassword: React.FC = () => {
       <div className="bg-neutral-800/90 rounded-2xl shadow-2xl px-10 py-10 max-w-md w-full">
         <h1 className="text-3xl font-bold mb-6 text-center">Forgot Password</h1>
 
-        <form className="space-y-6">
+        <form className="space-y-6" onSubmit={handleSubmit}>
           <p className="text-sm text-neutral-200 text-center leading-relaxed">
             Enter the email associated with your account.
           </p>
@@ -39,8 +46,7 @@ const ForgotPassword: React.FC = () => {
           </p>
 
           <button
-            type="button"
-            onClick={() => navigate("/checkemail")}
+            type="submit"
             className="w-full h-12 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg active:translate-y-[1px] hover:opacity-95 transition cursor-pointer"
           >
             Send Email
