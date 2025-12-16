@@ -44,7 +44,7 @@ const EditCompany: React.FC = () => {
     setFormData({
       ...formData,
       sameAddress: nextSame,
-      returnAddress: nextSame ? formData.mailingAddress : formData.returnAddress,
+      returnAddress: nextSame ? "Same as Mailing Address" : formData.returnAddress,
     });
   };
 
