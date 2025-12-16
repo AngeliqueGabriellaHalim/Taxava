@@ -23,6 +23,8 @@ type Property = {
 };
 const propertyTypes = ["Kos", "Ruko", "Gudang", "Kantor", "Lainnya"];
 
+
+
 // Fungsi sederhana untuk mendapatkan ID Property berikutnya
 const getNextPropertyId = (): number => {
   // Ambil semua properties (dari JSON dan Local Storage)
@@ -46,6 +48,8 @@ const getNextPropertyId = (): number => {
 
 const PropertySetup: React.FC = () => {
   const navigate = useNavigate();
+  
+const [formError, setFormError] = useState<string>("");
 
   // cek user login
   const currentUser: User | null = (() => {
@@ -100,29 +104,43 @@ const PropertySetup: React.FC = () => {
         }));
       };
 
-  const handleCheckbox =
-    (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
-      const checked = e.target.checked;
-      setForm((prev) => ({
-        ...prev,
-        [field]: checked,
-        // jika "all the data here is the same as company":
-        ...(field === "sameAsCompany" && checked && selectedCompany
-          ? {
+ const handleCheckbox =
+  (field: keyof FormState) =>
+  (e: React.ChangeEvent<HTMLInputElement>) => {
+    const checked = e.target.checked;
+
+    // ❌ If checkbox needs company but none selected
+    if (
+      checked &&
+      (field === "sameAsCompany" || field === "sameAsMailing") &&
+      !selectedCompany
+    ) {
+      setFormError("Please select a company first.");
+      return;
+    }
+
+    // clear error if valid
+    setFormError("");
+
+    setForm((prev) => ({
+      ...prev,
+      [field]: checked,
+
+      ...(field === "sameAsCompany" && checked && selectedCompany
+        ? {
             ownerName: selectedCompany.ownerName,
-            // return address ikut mailing company jika juga sameAsMailing
-            returnAddress:"Same As Mailing Addr",
-            sameAsMailing:true,
+            returnAddress: "Same as Company Mailing Address",
+            sameAsMailing: true,
           }
-          : {}),
-        // jika "same as mailing address" diaktifkan:
-        ...(field === "sameAsMailing" && checked && selectedCompany
-          ? {
-            returnAddress: "Same As Mailing Address",
+        : {}),
+
+      ...(field === "sameAsMailing" && checked && selectedCompany
+        ? {
+            returnAddress: "Same as Company Mailing Address",
           }
-          : {}),
-      }));
-    };
+        : {}),
+    }));
+  };
 
   // kalau user ganti company, dan checkbox-2 aktif, kita sesuaikan nilai terkait
   const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -213,6 +231,12 @@ const PropertySetup: React.FC = () => {
             onSubmit={handleSubmit}
             className="grid grid-cols-2 gap-x-10 mb-20"
           >
+            {formError && (
+              <div className="col-span-2 mb-6 rounded-lg bg-red-600/20 border border-red-600 text-red-400 px-4 py-3 text-sm">
+                {formError}
+              </div>
+            )}
+
             {/* LEFT COLUMN */}
             <div className="flex flex-col gap-6">
               {/* Property Name */}
