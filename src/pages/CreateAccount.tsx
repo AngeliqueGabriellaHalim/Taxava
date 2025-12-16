@@ -45,10 +45,29 @@ const CreateAccount: React.FC = () => {
   const saveUsers = (users: User[]) => {
     localStorage.setItem("users", JSON.stringify(users));
   };
-
+  const validateUsername = (username: string): string | null => {
+    const v = username.trim();
+    if (!v) return "Username is required.";
+    if (v.length < 3) return "Username must be at least 3 characters.";
+    if (v.length > 15) return "Username must be less than 15 characters.";
+    if (!/^[a-zA-Z][a-zA-Z0-9]*$/.test(v)) {
+      return "Username must start with a letter and contain only letters or numbers";
+    }
+    return null;
+  };
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
 
+    const usernameError = validateUsername(form.username);
+    if (usernameError) {
+      toast.error(usernameError);
+      return;
+    }
+
+    if (form.password !== form.passwordConfirm) {
+      toast.error("Passwords do not match.");
+      return;
+    }
     if (form.password !== form.passwordConfirm) {
       toast.error("Passwords do not match.");
       return;
