@@ -39,14 +39,27 @@ const EditCompany: React.FC = () => {
   };
 
   const toggleSameAddress = () => {
-    if (!formData) return;
-    const nextSame = !formData.sameAddress;
-    setFormData({
-      ...formData,
-      sameAddress: nextSame,
-      returnAddress: nextSame ? "Same as Mailing Address" : formData.returnAddress,
-    });
-  };
+  if (!formData) return;
+
+  //  block if mailing address is empty
+  if (!formData.mailingAddress.trim()) {
+    setErrorBanner("Please fill mailing address first.");
+    return;
+  }
+
+  setErrorBanner(""); // clear error
+
+  const nextSame = !formData.sameAddress;
+
+  setFormData({
+    ...formData,
+    sameAddress: nextSame,
+    returnAddress: nextSame
+      ? "Same as Mailing Address"
+      : formData.returnAddress,
+  });
+};
+
 
   const validate = () => {
     if (!formData) return false;
