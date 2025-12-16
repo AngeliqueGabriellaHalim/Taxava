@@ -1,6 +1,13 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
+interface User {
+  id: number;
+  username: string;
+  email: string;
+  password: string;
+  hasOnboarded: boolean;
+}
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
@@ -9,12 +16,23 @@ const Navbar: React.FC = () => {
     localStorage.removeItem("currentUser");
     navigate("/login");
   };
+  const handleHome =() =>{
+    const user = localStorage.getItem("currentUser");
+    if (user) {
+      const userObj = JSON.parse(user);
+      if (userObj.hasOnboarded) {
+        navigate("/home");
+      } else {
+        navigate("/onboardingdb");
+      }
+    }
+  }
 
   return (
     <nav className="w-full bg-zinc-950 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
       {/* Logo → Home */}
       <button
-        onClick={() => navigate("/home")}
+        onClick={handleHome}
         className="text-xl font-bold tracking-[0.3em] cursor-pointer"
       >
         TAXAVA
@@ -23,7 +41,7 @@ const Navbar: React.FC = () => {
       {/* Menu kanan */}
       <div className="flex items-center gap-4 text-zinc-300">
         <button
-          onClick={() => navigate("/home")}
+          onClick={handleHome}
           className="px-4 py-2 rounded-full border border-zinc-700 text-sm font-semibold hover:bg-zinc-800 transition"
         >
           Home

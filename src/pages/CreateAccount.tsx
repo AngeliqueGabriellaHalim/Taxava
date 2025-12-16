@@ -120,7 +120,7 @@ const CreateAccount: React.FC = () => {
         }}
       ></div>
       {/* Gradient Overlay */}
-      <div className="absolute inset-0 bg-linear-to-r/oklch from-lightgray/25 from-10% to-[#06012F]/90"></div>
+      <div className="absolute inset-0 bg-linear-to-r/oklch from-lightgray/25 from-5% to-[#06012F]/100"></div>
 
       {/* Noise layer */}
       <div className="absolute inset-0 bg-black/30 backdrop-blur-[2px]"></div>
