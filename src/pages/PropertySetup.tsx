@@ -111,15 +111,14 @@ const PropertySetup: React.FC = () => {
           ? {
             ownerName: selectedCompany.ownerName,
             // return address ikut mailing company jika juga sameAsMailing
-            returnAddress: prev.sameAsMailing
-              ? selectedCompany.mailingAddress
-              : prev.returnAddress,
+            returnAddress:"Same As Mailing Addr",
+            sameAsMailing:true,
           }
           : {}),
         // jika "same as mailing address" diaktifkan:
         ...(field === "sameAsMailing" && checked && selectedCompany
           ? {
-            returnAddress: selectedCompany.mailingAddress,
+            returnAddress: "Same As Mailing Address",
           }
           : {}),
       }));
@@ -275,8 +274,12 @@ const PropertySetup: React.FC = () => {
                 type="text"
                 placeholder="Enter owner name"
                 value={form.ownerName}
+                disabled={form.sameAsCompany}
                 onChange={handleChange("ownerName")}
-                className="bg-neutral-800 w-full p-3 rounded-lg"
+               className={`w-full p-3 rounded-lg ${form.sameAsCompany
+                    ? "bg-neutral-700 cursor-not-allowed"
+                    : "bg-neutral-800"
+                  }`}
               />
 
               {/* Return address */}
