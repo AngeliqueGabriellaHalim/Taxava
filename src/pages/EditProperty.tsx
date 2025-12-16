@@ -142,7 +142,7 @@ const EditProperty: React.FC = () => {
   (e: React.ChangeEvent<HTMLInputElement>) => {
     const checked = e.target.checked;
 
-    // ❌ checkbox requires company
+    //  checkbox requires company
     if (
       checked &&
       (field === "sameAsCompany" || field === "sameAsMailing") &&

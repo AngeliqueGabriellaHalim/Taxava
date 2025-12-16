@@ -21,9 +21,20 @@ const CompanySetup: React.FC = () => {
 
   // Handlers
   const handleSameAddress = () => {
+    if (!mailingAddress.trim()) {
+      setErrorBanner("Please fill mailing address first.");
+      return;
+    }
+    setErrorBanner("");
+
     const checked = !sameAddress;
     setSameAddress(checked);
-    if (checked) setReturnAddress(mailingAddress);
+
+    if (checked) {
+      setReturnAddress("Same as mailing address");
+    } else {
+      setReturnAddress("");
+    }
   };
 
   const handleMailingChange = (value: string) => {
