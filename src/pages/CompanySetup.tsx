@@ -1,5 +1,5 @@
 import React, { useState, useCallback } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import Navbar from "../component/Navbar";
 import { toast } from "react-toastify";
 import { getCurrentUser } from "../utils/getUser";
@@ -7,7 +7,7 @@ import { loadAllCompanies, saveCompaniesToLocal } from "../utils/getCompany";
 import type { Company } from "../utils/getCompany";
 
 const CompanySetup: React.FC = () => {
-  const navigate = useNavigate();
+  // const navigate = useNavigate();
 
   // State Input
   const [companyName, setCompanyName] = useState("");
@@ -57,12 +57,12 @@ const CompanySetup: React.FC = () => {
       setErrorBanner("Please fill all required fields.");
       return false;
     }
-    if (companyName.length >= 15) {
-      setErrorBanner("Company name maximum 15 characters.");
+    if (companyName.length >= 25) {
+      setErrorBanner("Company name maximum 25 characters.");
       return false;
     }
-    if (ownerName.length >= 15) {
-      setErrorBanner("Owner name maximum 15 characters.");
+    if (ownerName.length >= 25) {
+      setErrorBanner("Owner name maximum 25 characters.");
       return false;
     }
     if (!/^[0-9]+$/.test(companyNumber)) {

@@ -82,12 +82,12 @@ const EditCompany: React.FC = () => {
       return false;
     }
 
-    if (name.length >= 15) {
-      setErrorBanner("Company name maximum 15 characters.");
+    if (name.length >= 25) {
+      setErrorBanner("Company name maximum 25 characters.");
       return false;
     }
-    if (ownerName.length >= 15) {
-      setErrorBanner("Owner name maximum 15 characters.");
+    if (ownerName.length >= 25) {
+      setErrorBanner("Owner name maximum 25 characters.");
       return false;
     }
 

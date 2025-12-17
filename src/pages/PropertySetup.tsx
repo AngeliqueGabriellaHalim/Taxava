@@ -123,7 +123,7 @@ const PropertySetup: React.FC = () => {
 
         ...(field === "sameAsCompany" && checked && selectedCompany
           ? {
-              ownerName: selectedCompany.ownerName,
+              ownerName: "Same as Company",
               returnAddress: "Same as Company Mailing Address",
               sameAsMailing: true,
             }
@@ -167,12 +167,12 @@ const PropertySetup: React.FC = () => {
       return;
     }
 
-    if (form.name.length >= 15) {
-      setFormError("Company name maximum 15 characters.");
+    if (form.name.length >= 25) {
+      setFormError("Company name maximum 25 characters.");
       return false;
     }
-    if (form.ownerName.length >= 15) {
-      setFormError("Owner name maximum 15 characters.");
+    if (form.ownerName.length >= 25) {
+      setFormError("Owner name maximum 25 characters.");
       return false;
     }
 
@@ -209,20 +209,16 @@ const PropertySetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
+    <div className="min-h-screen bg-linear-to-r/hsl from-[#191A1F] from-15% to-[#06012F] text-white flex flex-col">
       {/* Navbar */}
       <Navbar />
 
-      <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
+      <div className=" bg-linear-to-r/hsl from-[#191A1F] from-15% to-[#06012F] text-white px-6 py-14 flex justify-center">
         {/* Card utama */}
         <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10 relative">
-          {/* LOGO */}
-          <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
-
           {/* HEADER */}
-          <div className="flex items-center justify-between mb-12">
-            {/* Dummy kiri */}
-            <div className="w-32 opacity-0">TAXAVA</div>
+          <div className="flex items-center justify-center mb-6">
+            <div className="w-32 opacity-0 mb-15">TAXAVA</div>
 
             {/* Judul di tengah */}
             <h1 className="text-3xl font-bold text-center">Property Setup</h1>
@@ -235,7 +231,7 @@ const PropertySetup: React.FC = () => {
             className="grid grid-cols-2 gap-x-10 mb-20"
           >
             {formError && (
-              <div className="col-span-2 mb-6 rounded-lg bg-red-600/20 border border-red-600 text-red-400 px-4 py-3 text-sm">
+              <div className="col-span-2 mb-6 rounded-lg bg-red-700/50 p-3  text-md text-white font-semibold py-3 text-sm">
                 {formError}
               </div>
             )}
@@ -285,9 +281,9 @@ const PropertySetup: React.FC = () => {
             </div>
 
             {/* RIGHT COLUMN */}
-            <div className="flex flex-col gap-6">
+            <div className="flex flex-col gap-2">
               {/* Same as company */}
-              <label className="flex items-center text-sm gap-2 cursor-pointer">
+              <label className="flex ml-1 items-center text-md gap-2 cursor-pointer">
                 <input
                   type="checkbox"
                   checked={form.sameAsCompany}
@@ -303,7 +299,7 @@ const PropertySetup: React.FC = () => {
                 value={form.ownerName}
                 disabled={form.sameAsCompany}
                 onChange={handleChange("ownerName")}
-                className={`w-full p-3 rounded-lg ${
+                className={`w-full p-3 rounded-lg mb-4 ${
                   form.sameAsCompany
                     ? "bg-neutral-700 cursor-not-allowed"
                     : "bg-neutral-800"
@@ -325,7 +321,7 @@ const PropertySetup: React.FC = () => {
               />
 
               {/* Same as mailing */}
-              <label className="flex items-center text-sm gap-2 cursor-pointer">
+              <label className="flex items-center text-sm gap-2 cursor-pointer ml-3">
                 <input
                   type="checkbox"
                   checked={form.sameAsMailing}
@@ -341,7 +337,7 @@ const PropertySetup: React.FC = () => {
             <button
               type="submit"
               onClick={handleSubmit}
-              className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
+              className="cursor-pointer bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
             >
               Add Property
             </button>
@@ -349,7 +345,7 @@ const PropertySetup: React.FC = () => {
             <button
               type="button"
               onClick={handleCancel}
-              className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
+              className="cursor-pointer bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
             >
               Cancel
             </button>
