@@ -48,58 +48,63 @@ const Home: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-[#191A1F] text-white flex flex-col">
+    <div className="min-h-screen bg-linear-to-r/hsl from-[#191A1F] from-5% to-[#06012F] text-white flex flex-col">
       <Navbar />
-
-      <main className="flex flex-1 items-center justify-center">
-        <div className="flex flex-col md:flex-row gap-64">
+      <div className="bg-linear-to-r from-indigo-600 to-[#7C3AED] bg-[#7C3AED] rounded-r-full w-[40%] h-16 absolute top-[77%] "></div>
+      <main className="flex flex-1 items-center justify-between">
+        <div className="flex w-20%  px-[15vh]">
+          <p className="text-6xl font-light">
+            Welcome, <br />
+            <span className="text-[20vh] font-medium">
+              {currentUser.username}!
+            </span>
+          </p>
+        </div>
+        <div className="flex flex-row  md:flex-row pl-[17vh] gap-[15vh] pr-[20vh] box-border">
           {/* COMPANY CARD */}
-          <div className="w-72 h-80 rounded-3xl bg-[#33343A] flex flex-col items-center justify-between py-10 shadow-lg">
+          <div className="w-2xs h-3xl rounded-3xl gap-12  bg-[#2a2c30]/80  flex flex-col items-center justify-evenly py-10 shadow-md shadow-gray-700">
             {/* filled jika ada company, outline jika belum */}
             {hasCompany ? (
-              <div className="w-4 h-4 rounded-full bg-[#7C3AED]" />
+              <div className="w-8 h-8 rounded-full bg-linear-to-r from-indigo-600 to-[#7C3AED] bg-[#7C3AED] " />
             ) : (
-              <div className="w-5 h-5 rounded-full border-4 border-[#7C3AED]" />
+              <div className="w-10 h-10 rounded-full border-4 border-[#7C3AED]" />
             )}
 
             <div className="text-center">
               <p className="text-4xl font-semibold leading-tight">
-                Company
-                <br />
-                Set Up
+                Company <br /> Set Up
               </p>
             </div>
 
             <button
               type="button"
               onClick={handleCompanyAction}
-              className="px-10 py-2 rounded-full bg-[#7C3AED] text-sm font-semibold hover:opacity-90 active:translate-y-px transition cursor-pointer"
+              className="px-10 py-2 rounded-full bg-linear-to-r from-indigo-600 to-[#7C3AED] bg-[#7C3AED] text-md font-semibold hover:opacity-80 active:translate-y-px transition cursor-pointer"
             >
               {hasCompany ? "View" : "Add Company"}
             </button>
           </div>
 
           {/* PROPERTY CARD */}
-          <div className="w-72 h-80 rounded-3xl bg-[#33343A] flex flex-col items-center justify-between py-10 shadow-lg">
+          <div className="w-2xs h-3xl rounded-3xl gap-12 bg-[#2a2c30]/80 flex flex-col items-center justify-evenly py-10 shadow-md shadow-gray-700">
             {/* filled jika ada property, outline jika belum */}
             {hasProperty ? (
-              <div className="w-4 h-4 rounded-full bg-[#7C3AED]" />
+              <div className="w-8 h-8 rounded-full bg-linear-to-r from-indigo-600 to-[#7C3AED] bg-[#7C3AED]" />
             ) : (
-              <div className="w-5 h-5 rounded-full border-4 border-[#7C3AED]" />
+              <div className="w-10 h-10 rounded-full border-4 border-[#7C3AED]" />
             )}
 
             <div className="text-center">
               <p className="text-4xl font-semibold leading-tight">
                 Property
-                <br />
-                Set Up
+                <br /> Set Up
               </p>
             </div>
 
             <button
               type="button"
               onClick={handlePropertyAction}
-              className="px-10 py-2 rounded-full bg-[#7C3AED] text-sm font-semibold hover:opacity-90 active:translate-y-px transition"
+              className="px-10 py-2 rounded-full bg-linear-to-r from-indigo-600 to-[#7C3AED] bg-[#7C3AED] text-md font-semibold hover:opacity-80 cursor-pointer active:translate-y-px transition"
             >
               {hasProperty ? "View" : "Add Property"}
             </button>
