@@ -58,20 +58,13 @@ const ManageCompanies: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
+    <div className="min-h-screen bg-linear-to-r/hsl from-[#191A1F] from-15% to-[#06012F] text-white flex flex-col">
       {/* Navbar */}
       <Navbar />
 
       {/* Main content */}
       <div className="flex justify-center px-4 py-8">
         <div className="w-full max-w-5xl pt-15">
-          {/* Logo */}
-          <div className="mb-6 justify-start">
-            <span className="tracking-[0.3em] text-xl font-semibold">
-              TAXAVA
-            </span>
-          </div>
-
           {/* Title */}
           <h1 className="text-4xl md:text-5xl font-bold mb-6">
             Manage Companies
@@ -86,7 +79,7 @@ const ManageCompanies: React.FC = () => {
               Search Company
             </label>
 
-            <div className="flex items-center gap-3 bg-zinc-800 rounded-full px-4 py-3 shadow-md">
+            <div className="flex items-center gap-3 bg-slate-800 rounded-full px-4 py-3 shadow-md">
               <span className="text-zinc-400 text-xl ">
                 <Search />
               </span>
@@ -102,7 +95,7 @@ const ManageCompanies: React.FC = () => {
               <button
                 type="button"
                 onClick={() => setSortAsc((prev) => !prev)}
-                className="rounded-full border border-zinc-600 px-3 py-1 text-xs uppercase tracking-wide text-zinc-300 hover:bg-zinc-700 transition"
+                className="rounded-full border border-zinc-600 px-3 py-1 text-xs uppercase tracking-wide text-zinc-300 cursor-pointer hover:bg-linear-to-r hover:from-indigo-600 hover:to-[#7C3AED]   transition"
               >
                 {sortAsc ? "A → Z" : "Z → A"}
               </button>
@@ -121,7 +114,8 @@ const ManageCompanies: React.FC = () => {
             {filteredCompanies.map((company) => (
               <div
                 key={company.id}
-                className="bg-zinc-800 rounded-2xl p-4 md:p-5 shadow-lg border border-zinc-700 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
+                className="bg-zinc-700/40 backdrop-blur-sm
+rounded-2xl p-4 md:p-5 shadow-lg border border-zinc-800 flex flex-col md:flex-row md:items-center md:justify-between gap-4"
               >
                 {/* Info */}
                 <div className="space-y-1">
@@ -144,7 +138,7 @@ const ManageCompanies: React.FC = () => {
                   <button
                     type="button"
                     onClick={() => handleEdit(company.id)}
-                    className="px-5 py-2 rounded-full bg-indigo-500 hover:bg-indigo-400 text-sm font-semibold shadow-md transition"
+                    className="px-5 py-2 rounded-full bg-[#7C3AED] hover:bg-violet-800/80 text-sm font-semibold shadow-md transition"
                   >
                     Edit Company
                   </button>
@@ -154,12 +148,17 @@ const ManageCompanies: React.FC = () => {
           </div>
 
           {/* Add Company */}
-          <div className="mt-4 mb-10 pb-6 pt-4 border-t border-zinc-800 bg-zinc-900/60 sticky bottom-0">
+          <div className="mt-4 mb-10 pb-6  w-full pt-4  border-t-4 border-zinc-900 bg-linear-to-r/hsl from-[#191A1F] from-5% to-[#06012F] sticky bottom-0">
             <div className="flex justify-center">
               <button
                 type="button"
                 onClick={handleAdd}
-                className="px-10 py-3 rounded-full bg-indigo-500 hover:bg-indigo-400 text-base font-semibold shadow-lg transition"
+                className="px-10 py-3 rounded-full
+    bg-linear-to-r from-indigo-600 to-[#7C3AED]
+    text-base font-semibold text-white
+    shadow-lg transition-all duration-300
+    cursor-pointer
+    hover:from-indigo-400 hover:to-[#8B5CF6]"
               >
                 Add Company
               </button>

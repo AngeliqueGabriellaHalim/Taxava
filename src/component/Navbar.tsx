@@ -22,7 +22,7 @@ const Navbar: React.FC = () => {
   };
 
   return (
-    <nav className="w-full bg-zinc-950  px-6 py-4 flex items-center justify-between sticky top-0 z-50 h-[12vh]">
+    <nav className="w-full bg-zinc-950 border-b-2 border-zinc-900  px-6 py-4 flex items-center justify-between sticky top-0 z-50 h-[12vh]">
       {/* Logo navigate ke Home */}
       <button
         onClick={handleHome}
