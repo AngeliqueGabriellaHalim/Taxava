@@ -46,11 +46,25 @@ const CompanySetup: React.FC = () => {
   const validateData = useCallback(() => {
     setErrorBanner("");
 
-    if (!companyName || !companyNumber || !mailingAddress || !returnAddress || !ownerName || !ownerEmail) {
+    if (
+      !companyName ||
+      !companyNumber ||
+      !mailingAddress ||
+      !returnAddress ||
+      !ownerName ||
+      !ownerEmail
+    ) {
       setErrorBanner("Please fill all required fields.");
       return false;
     }
-
+    if (companyName.length >= 15) {
+      setErrorBanner("Company name maximum 15 characters.");
+      return false;
+    }
+    if (ownerName.length >= 15) {
+      setErrorBanner("Owner name maximum 15 characters.");
+      return false;
+    }
     if (!/^[0-9]+$/.test(companyNumber)) {
       setErrorBanner("Company number must contain numbers only.");
       return false;
@@ -62,7 +76,14 @@ const CompanySetup: React.FC = () => {
       return false;
     }
     return true;
-  }, [companyName, companyNumber, mailingAddress, returnAddress, ownerName, ownerEmail]);
+  }, [
+    companyName,
+    companyNumber,
+    mailingAddress,
+    returnAddress,
+    ownerName,
+    ownerEmail,
+  ]);
 
   const handleAddCompany = () => {
     if (!validateData()) return;
@@ -74,9 +95,10 @@ const CompanySetup: React.FC = () => {
     }
 
     const allCompanies = loadAllCompanies();
-    const maxId = allCompanies.length > 0
-      ? Math.max(...allCompanies.map((c: Company) => c.id))
-      : 0;
+    const maxId =
+      allCompanies.length > 0
+        ? Math.max(...allCompanies.map((c: Company) => c.id))
+        : 0;
 
     const newCompany: Company = {
       id: maxId + 1,
@@ -177,10 +199,11 @@ const CompanySetup: React.FC = () => {
                 onChange={(e) => setReturnAddress(e.target.value)}
                 placeholder="Enter package return address"
                 disabled={sameAddress}
-                className={`w-full p-3 rounded-lg ${sameAddress
-                  ? "bg-neutral-700 cursor-not-allowed"
-                  : "bg-neutral-800"
-                  }`}
+                className={`w-full p-3 rounded-lg ${
+                  sameAddress
+                    ? "bg-neutral-700 cursor-not-allowed"
+                    : "bg-neutral-800"
+                }`}
               />
 
               <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
