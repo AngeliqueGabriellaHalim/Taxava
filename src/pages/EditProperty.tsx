@@ -128,54 +128,52 @@ const EditProperty: React.FC = () => {
 
   const handleChange =
     (field: keyof FormState) =>
-      (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const value = e.target.value;
-        setForm((prev) => ({
-          ...prev,
-          [field]: value,
-          error: "",
-        }));
-      };
-
-  const handleCheckbox =
-  (field: keyof FormState) =>
-  (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
-
-    //  checkbox requires company
-    if (
-      checked &&
-      (field === "sameAsCompany" || field === "sameAsMailing") &&
-      !selectedCompany
-    ) {
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const value = e.target.value;
       setForm((prev) => ({
         ...prev,
-        error: "Please select a company first.",
+        [field]: value,
+        error: "",
       }));
-      return;
-    }
+    };
 
-    setForm((prev) => ({
-      ...prev,
-      error: "", // clear error
-      [field]: checked,
+  const handleCheckbox =
+    (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const checked = e.target.checked;
 
-      ...(field === "sameAsCompany" && checked && selectedCompany
-        ? {
-            ownerName: selectedCompany.ownerName,
-            returnAddress: "Same as Company Mailing Address",
-            sameAsMailing: true,
-          }
-        : {}),
+      //  checkbox requires company
+      if (
+        checked &&
+        (field === "sameAsCompany" || field === "sameAsMailing") &&
+        !selectedCompany
+      ) {
+        setForm((prev) => ({
+          ...prev,
+          error: "Please select a company first.",
+        }));
+        return;
+      }
 
-      ...(field === "sameAsMailing" && checked && selectedCompany
-        ? {
-            returnAddress: "Same as Company Mailing Address",
-          }
-        : {}),
-    }));
-  };
+      setForm((prev) => ({
+        ...prev,
+        error: "", // clear error
+        [field]: checked,
 
+        ...(field === "sameAsCompany" && checked && selectedCompany
+          ? {
+              ownerName: selectedCompany.ownerName,
+              returnAddress: "Same as Company Mailing Address",
+              sameAsMailing: true,
+            }
+          : {}),
+
+        ...(field === "sameAsMailing" && checked && selectedCompany
+          ? {
+              returnAddress: "Same as Company Mailing Address",
+            }
+          : {}),
+      }));
+    };
 
   const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const companyId = e.target.value;
@@ -209,6 +207,21 @@ const EditProperty: React.FC = () => {
       setForm((prev) => ({
         ...prev,
         error: "Please fill in property name and type.",
+      }));
+      return;
+    }
+
+    if (form.name.length >= 15) {
+      setForm((prev) => ({
+        ...prev,
+        error: "Property name maximum 15 characters.",
+      }));
+      return;
+    }
+    if (form.ownerName.length >= 15) {
+      setForm((prev) => ({
+        ...prev,
+        error: "Owner name maximum 15 characters.",
       }));
       return;
     }
@@ -256,7 +269,6 @@ const EditProperty: React.FC = () => {
           <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">
             Edit Property
           </h1>
-
 
           {/* Error Banner */}
           {form.error && (
@@ -338,31 +350,33 @@ const EditProperty: React.FC = () => {
                 </label>
 
                 {/* Owner name */}
-                 <input
-                type="text"
-                placeholder="Enter owner name"
-                value={form.ownerName}
-                disabled={form.sameAsCompany}
-                onChange={handleChange("ownerName")}
-               className={`w-full p-3 rounded-lg ${form.sameAsCompany
-                    ? "bg-neutral-700 cursor-not-allowed"
-                    : "bg-neutral-800"
+                <input
+                  type="text"
+                  placeholder="Enter owner name"
+                  value={form.ownerName}
+                  disabled={form.sameAsCompany}
+                  onChange={handleChange("ownerName")}
+                  className={`w-full p-3 rounded-lg ${
+                    form.sameAsCompany
+                      ? "bg-neutral-700 cursor-not-allowed"
+                      : "bg-neutral-800"
                   }`}
-              />
+                />
 
                 {/* Return address */}
                 <div className="flex items-center ">
                   <input
-                type="text"
-                placeholder="Enter package return address"
-                value={form.returnAddress}
-                disabled={form.sameAsMailing}
-                onChange={handleChange("returnAddress")}
-                className={`w-full p-3 rounded-lg ${form.sameAsMailing
-                    ? "bg-neutral-700 cursor-not-allowed"
-                    : "bg-neutral-800"
-                  }`}
-              />
+                    type="text"
+                    placeholder="Enter package return address"
+                    value={form.returnAddress}
+                    disabled={form.sameAsMailing}
+                    onChange={handleChange("returnAddress")}
+                    className={`w-full p-3 rounded-lg ${
+                      form.sameAsMailing
+                        ? "bg-neutral-700 cursor-not-allowed"
+                        : "bg-neutral-800"
+                    }`}
+                  />
                 </div>
 
                 {/* Checkbox: same as mailing address */}

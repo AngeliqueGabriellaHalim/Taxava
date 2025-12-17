@@ -23,8 +23,6 @@ type Property = {
 };
 const propertyTypes = ["Kos", "Ruko", "Gudang", "Kantor", "Lainnya"];
 
-
-
 // Fungsi sederhana untuk mendapatkan ID Property berikutnya
 const getNextPropertyId = (): number => {
   // Ambil semua properties (dari JSON dan Local Storage)
@@ -48,8 +46,8 @@ const getNextPropertyId = (): number => {
 
 const PropertySetup: React.FC = () => {
   const navigate = useNavigate();
-  
-const [formError, setFormError] = useState<string>("");
+
+  const [formError, setFormError] = useState<string>("");
 
   // cek user login
   const currentUser: User | null = (() => {
@@ -96,51 +94,50 @@ const [formError, setFormError] = useState<string>("");
 
   const handleChange =
     (field: keyof FormState) =>
-      (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-        const value = e.target.value;
-        setForm((prev) => ({
-          ...prev,
-          [field]: value,
-        }));
-      };
+    (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+      const value = e.target.value;
+      setForm((prev) => ({
+        ...prev,
+        [field]: value,
+      }));
+    };
 
- const handleCheckbox =
-  (field: keyof FormState) =>
-  (e: React.ChangeEvent<HTMLInputElement>) => {
-    const checked = e.target.checked;
+  const handleCheckbox =
+    (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+      const checked = e.target.checked;
 
-    //if havent selected company
-    if (
-      checked &&
-      (field === "sameAsCompany" || field === "sameAsMailing") &&
-      !selectedCompany
-    ) {
-      setFormError("Please select a company first.");
-      return;
-    }
+      //if havent selected company
+      if (
+        checked &&
+        (field === "sameAsCompany" || field === "sameAsMailing") &&
+        !selectedCompany
+      ) {
+        setFormError("Please select a company first.");
+        return;
+      }
 
-    // clear error if valid
-    setFormError("");
+      // clear error if valid
+      setFormError("");
 
-    setForm((prev) => ({
-      ...prev,
-      [field]: checked,
+      setForm((prev) => ({
+        ...prev,
+        [field]: checked,
 
-      ...(field === "sameAsCompany" && checked && selectedCompany
-        ? {
-            ownerName: selectedCompany.ownerName,
-            returnAddress: "Same as Company Mailing Address",
-            sameAsMailing: true,
-          }
-        : {}),
+        ...(field === "sameAsCompany" && checked && selectedCompany
+          ? {
+              ownerName: selectedCompany.ownerName,
+              returnAddress: "Same as Company Mailing Address",
+              sameAsMailing: true,
+            }
+          : {}),
 
-      ...(field === "sameAsMailing" && checked && selectedCompany
-        ? {
-            returnAddress: "Same as Company Mailing Address",
-          }
-        : {}),
-    }));
-  };
+        ...(field === "sameAsMailing" && checked && selectedCompany
+          ? {
+              returnAddress: "Same as Company Mailing Address",
+            }
+          : {}),
+      }));
+    };
 
   // kalau user ganti company, dan checkbox-2 aktif, kita sesuaikan nilai terkait
   const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
@@ -163,13 +160,22 @@ const [formError, setFormError] = useState<string>("");
     e.preventDefault();
 
     if (!selectedCompany) {
-      toast.error("Please select a company first.");
+      setFormError("Please select a company first.");
       return;
     }
 
     if (!form.name || !form.type) {
-      toast.error("Please fill in property name and type.");
+      setFormError("Please fill in property name and type.");
       return;
+    }
+
+    if (form.name.length >= 15) {
+      setFormError("Company name maximum 15 characters.");
+      return false;
+    }
+    if (form.ownerName.length >= 15) {
+      setFormError("Owner name maximum 15 characters.");
+      return false;
     }
 
     // Dapatkan ID baru
@@ -300,10 +306,11 @@ const [formError, setFormError] = useState<string>("");
                 value={form.ownerName}
                 disabled={form.sameAsCompany}
                 onChange={handleChange("ownerName")}
-               className={`w-full p-3 rounded-lg ${form.sameAsCompany
+                className={`w-full p-3 rounded-lg ${
+                  form.sameAsCompany
                     ? "bg-neutral-700 cursor-not-allowed"
                     : "bg-neutral-800"
-                  }`}
+                }`}
               />
 
               {/* Return address */}
@@ -313,10 +320,11 @@ const [formError, setFormError] = useState<string>("");
                 value={form.returnAddress}
                 disabled={form.sameAsMailing}
                 onChange={handleChange("returnAddress")}
-                className={`w-full p-3 rounded-lg ${form.sameAsMailing
+                className={`w-full p-3 rounded-lg ${
+                  form.sameAsMailing
                     ? "bg-neutral-700 cursor-not-allowed"
                     : "bg-neutral-800"
-                  }`}
+                }`}
               />
 
               {/* Same as mailing */}
