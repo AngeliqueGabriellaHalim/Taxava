@@ -17,7 +17,7 @@ const ManageCompanies: React.FC = () => {
   const navigate = useNavigate();
 
   // ----- ambil user yang sedang login dari localStorage -----
-  const currentUser: User | null = (() => {
+    const currentUser: User | null = (() => {
     try {
       const raw = localStorage.getItem("currentUser");
       return raw ? (JSON.parse(raw) as User) : null;
@@ -25,20 +25,31 @@ const ManageCompanies: React.FC = () => {
       return null;
     }
   })();
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
 
-  const userCompanies = getCompaniesByUser(currentUser.id);
+  const isAuthenticated = Boolean(currentUser);
+
+   const userCompanies = useMemo(() => {
+    if (!currentUser) return [];
+    return getCompaniesByUser(currentUser.id);
+  }, [currentUser]);
 
   const filteredCompanies = useMemo(() => {
     const s = search.toLowerCase().trim();
-    let result = userCompanies.filter((c) => c.name.toLowerCase().includes(s));
-    result = result.sort((a, b) =>
-      sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
+
+    const result = userCompanies.filter((c) =>
+      c.name.toLowerCase().includes(s)
     );
-    return result;
+
+    return result.sort((a, b) =>
+      sortAsc
+        ? a.name.localeCompare(b.name)
+        : b.name.localeCompare(a.name)
+    );
   }, [userCompanies, search, sortAsc]);
+
+  if (!isAuthenticated) {
+    return <Navigate to="/login" replace />;
+  }
 
   const handleEdit = (id: number) => {
     navigate(`/edit-company/${id}`);

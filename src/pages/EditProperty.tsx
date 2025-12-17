@@ -1,6 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
-import { Navigate, useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import { getCompaniesByUser } from "../utils/getCompany";
 import { getPropertiesByUser } from "../utils/getProperty";
@@ -23,290 +23,205 @@ type Property = {
   companyId: number;
 };
 
+type Company = {
+  id: number;
+  name: string;
+  ownerName: string;
+  mailingAddress: string;
+};
+
+type FormState = {
+  name: string;
+  type: string;
+  companyId: string;
+  ownerName: string;
+  returnAddress: string;
+  sameAsCompany: boolean;
+  sameAsMailing: boolean;
+  error: string;
+};
+
 const propertyTypes = ["Kos", "Ruko", "Gudang", "Kantor", "Lainnya"];
 
 const EditProperty: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+  const propertyId = Number(id);
 
-  // cek user login
   const currentUser: User | null = (() => {
     try {
       const raw = localStorage.getItem("currentUser");
-      return raw ? (JSON.parse(raw) as User) : null;
+      return raw ? JSON.parse(raw) : null;
     } catch {
       return null;
     }
   })();
 
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
+  const userCompanies: Company[] = currentUser
+    ? getCompaniesByUser(currentUser.id)
+    : [];
 
-  // hanya company milik user login
-  const userCompanies = getCompaniesByUser(currentUser.id);
+  const properties: Property[] = currentUser
+    ? getPropertiesByUser(currentUser.id)
+    : [];
 
-  const loadAllProperties = (): Property[] => {
-    // Gabungkan seed + local dalam urutan (seed dulu, lalu local)
-    const allProps = getPropertiesByUser(currentUser.id);
+  const property = properties.find((p) => p.id === propertyId) ?? null;
+  const propertyCompany =
+    property &&
+    userCompanies.find((c) => c.id === property.companyId);
 
-    // Buat map, yang terakhir akan menimpa yang sebelumnya
-    const map = new Map<number, Property>();
-    allProps.forEach((p) => map.set(p.id, p));
+    const [form, setForm] = useState<FormState | null>(() => {
+    if (!property || !propertyCompany) return null;
 
-    return Array.from(map.values());
-  };
-
-  const propertyId = Number(id);
-  const allProperties = loadAllProperties();
-  const property = allProperties.find((p) => p.id === propertyId);
-
-  // kalau property tidak ada atau bukan milik company user, redirect balik
-  const propertyCompany = property
-    ? userCompanies.find((c) => c.id === property.companyId)
-    : undefined;
-
-  if (!property || !propertyCompany) {
-    toast.error("Property not found or not accessible.");
-    return <Navigate to="/manage-properties" replace />;
-  }
-
-  type FormState = {
-    name: string;
-    type: string;
-    companyId: string;
-    ownerName: string;
-    returnAddress: string;
-    sameAsCompany: boolean;
-    sameAsMailing: boolean;
-    error: string;
-  };
-
-  const [form, setForm] = useState<FormState>({
-    name: "",
-    type: "",
-    companyId: "",
-    ownerName: "",
-    returnAddress: "",
-    sameAsCompany: false,
-    sameAsMailing: property.sameAddress,
-    error: "",
-  });
-
-  const initialData = useMemo(
-    () => ({
+    return {
       name: property.name,
       type: property.type,
       companyId: String(property.companyId),
       ownerName: propertyCompany.ownerName,
       returnAddress: property.returnAddress,
+        sameAsCompany: false,
       sameAsMailing: property.sameAddress,
-    }),
-    [
-      propertyId,
-      property.name,
-      property.type,
-      property.companyId,
-      property.returnAddress,
-      property.sameAddress,
-      propertyCompany.ownerName,
-    ]
-  ); // Hanya bergantung pada propertyId
+      error: "",
+    };
+  });
 
   useEffect(() => {
-    setForm({
-      name: initialData.name,
-      type: initialData.type,
-      companyId: initialData.companyId,
-      ownerName: initialData.ownerName,
-      returnAddress: initialData.returnAddress,
-      sameAsCompany: false,
-      sameAsMailing: initialData.sameAsMailing,
-      error: "",
-    });
-  }, [initialData]);
+    if (!currentUser) {
+      navigate("/login", { replace: true });
+      return;
+    }
+
+    if (!property || !propertyCompany) {
+      toast.error("Property not found or not accessible");
+      navigate("/manage-properties", { replace: true });
+    }
+  }, [currentUser, property, propertyCompany, navigate]);
+
+  if (!form) return null;
 
   const selectedCompany = userCompanies.find(
     (c) => c.id === Number(form.companyId)
   );
+
   const mailingAddress = selectedCompany?.mailingAddress ?? "";
 
   const handleChange =
     (field: keyof FormState) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-      const value = e.target.value;
-      setForm((prev) => ({
-        ...prev,
-        [field]: value,
-        error: "",
-      }));
+      setForm({ ...form, [field]: e.target.value, error: "" });
     };
 
   const handleCheckbox =
-    (field: keyof FormState) => (e: React.ChangeEvent<HTMLInputElement>) => {
+    (field: "sameAsCompany" | "sameAsMailing") =>
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const checked = e.target.checked;
 
-      //  checkbox requires company
-      if (
-        checked &&
-        (field === "sameAsCompany" || field === "sameAsMailing") &&
-        !selectedCompany
-      ) {
-        setForm((prev) => ({
-          ...prev,
-          error: "Please select a company first.",
-        }));
+      if (field === "sameAsCompany" && checked && selectedCompany) {
+        setForm({
+          ...form,
+          sameAsCompany: true,
+          ownerName: selectedCompany.ownerName,
+          error: "",
+        });
         return;
       }
 
-      setForm((prev) => ({
-        ...prev,
-        error: "", // clear error
-        [field]: checked,
+      if (field === "sameAsMailing" && checked) {
+        setForm({
+          ...form,
+          sameAsMailing: true,
+          returnAddress: mailingAddress,
+          error: "",
+        });
+        return;
+      }
 
-        ...(field === "sameAsCompany" && checked && selectedCompany
-          ? {
-              ownerName: selectedCompany.ownerName,
-              returnAddress: "Same as Company Mailing Address",
-              sameAsMailing: true,
-            }
-          : {}),
-
-        ...(field === "sameAsMailing" && checked && selectedCompany
-          ? {
-              returnAddress: "Same as Company Mailing Address",
-            }
-          : {}),
-      }));
+      setForm({ ...form, [field]: checked, error: "" });
     };
 
-  const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const companyId = e.target.value;
-    const newCompany = userCompanies.find((c) => c.id === Number(companyId));
-
-    setForm((prev) => ({
-      ...prev,
-      companyId,
+  const handleCompanyChange = (
+    e: React.ChangeEvent<HTMLSelectElement>
+  ) => {
+    setForm({
+      ...form,
+      companyId: e.target.value,
+      sameAsCompany: false,
+      sameAsMailing: false,
       error: "",
-      ...(prev.sameAsCompany && newCompany
-        ? { ownerName: newCompany.ownerName }
-        : {}),
-      ...(prev.sameAsMailing && newCompany
-        ? { returnAddress: newCompany.mailingAddress }
-        : {}),
-    }));
-  };
-
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-
-    if (!selectedCompany) {
-      setForm((prev) => ({
-        ...prev,
-        error: "Please select a company.",
-      }));
-      return;
-    }
-
-    if (!form.name || !form.type) {
-      setForm((prev) => ({
-        ...prev,
-        error: "Please fill in property name and type.",
-      }));
-      return;
-    }
-
-    if (form.name.length >= 15) {
-      setForm((prev) => ({
-        ...prev,
-        error: "Property name maximum 15 characters.",
-      }));
-      return;
-    }
-    if (form.ownerName.length >= 15) {
-      setForm((prev) => ({
-        ...prev,
-        error: "Owner name maximum 15 characters.",
-      }));
-      return;
-    }
-
-    const finalReturnAddress = form.sameAsMailing
-      ? mailingAddress
-      : form.returnAddress;
-
-    const updated: Property = {
-      ...property,
-      name: form.name,
-      type: form.type,
-      owner: form.ownerName,
-      returnAddress: finalReturnAddress,
-      sameAddress: form.sameAsMailing,
-      companyId: selectedCompany.id,
-    };
-
-    const existing = loadAllProperties();
-    const updatedList = existing.map((p) =>
-      p.id === updated.id ? updated : p
-    );
-
-    localStorage.setItem("properties", JSON.stringify(updatedList));
-    toast.success("Property updated successfully.");
-    navigate("/manage-properties");
+    });
   };
 
   const handleCancel = () => {
     navigate("/manage-properties");
   };
 
-  return (
-    <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
-      {/* Navbar */}
-      <Navbar />
-      <div className="min-h-screen bg-zinc-900 text-white flex justify-center px-4 py-10">
-        {/* Logo */}
-        <div className="absolute top-6 left-6">
-          <span className="tracking-[0.3em] text-xl font-semibold">TAXAVA</span>
-        </div>
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
 
-        <div className="w-full max-w-4xl pt-8">
-          {/* Title */}
-          <h1 className="text-4xl md:text-5xl font-bold text-center mb-8">
+    if (!selectedCompany) {
+      setForm({ ...form, error: "Please select a company" });
+      return;
+    }
+
+    if (!form.name || !form.type) {
+      setForm({ ...form, error: "Please fill all required fields" });
+      return;
+    }
+
+    const updated: Property = {
+      ...property!,
+      name: form.name,
+      type: form.type,
+      owner: form.ownerName,
+      returnAddress: form.sameAsMailing
+        ? mailingAddress
+        : form.returnAddress,
+      sameAddress: form.sameAsMailing,
+      companyId: selectedCompany.id,
+    };
+
+    const next = properties.map((p) =>
+      p.id === updated.id ? updated : p
+    );
+
+    localStorage.setItem("properties", JSON.stringify(next));
+    toast.success("Property updated successfully");
+    navigate("/manage-properties");
+  };
+
+  return (
+    <div className="min-h-screen bg-zinc-900 text-white">
+      <Navbar />
+
+      <div className="flex justify-center px-4 py-10">
+        <div className="w-full max-w-4xl">
+          <h1 className="text-4xl font-bold text-center mb-8">
             Edit Property
           </h1>
 
-          {/* Error Banner */}
           {form.error && (
-            <div className="mb-6">
-              <p className="text-sm text-zinc-300 mb-2">Error Banner</p>
-              <div className="bg-zinc-800 rounded-2xl px-4 py-3 min-h-[48px] flex items-center text-sm text-red-300">
-                {form.error}
-              </div>
+            <div className="mb-6 bg-zinc-800 text-red-300 px-4 py-3 rounded-xl">
+              {form.error}
             </div>
           )}
 
           <form onSubmit={handleSubmit} className="space-y-8">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* LEFT COLUMN */}
+              {/* LEFT */}
               <div className="space-y-4">
-                {/* Property name */}
-                <div className="flex items-center bg-zinc-800 rounded-2xl px-4 py-3">
-                  <input
-                    type="text"
-                    placeholder="Enter property name"
-                    value={form.name}
-                    onChange={handleChange("name")}
-                    className="flex-1 bg-transparent outline-none text-sm md:text-base placeholder:text-zinc-500"
-                  />
-                </div>
+                <input
+                  type="text"
+                  placeholder="Property name"
+                  value={form.name}
+                  onChange={handleChange("name")}
+                  className="w-full bg-zinc-800 p-3 rounded-xl"
+                />
 
-                {/* Property type */}
-                <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
-                  <span className="text-zinc-400 mr-3"></span>
+                <div className="relative">
                   <select
                     value={form.type}
                     onChange={handleChange("type")}
-                    className="flex-1 bg-neutral-800 outline-none text-sm md:text-base appearance-none pr-6"
+                    className="w-full bg-zinc-800 p-3 rounded-xl appearance-none"
                   >
                     <option value="" disabled>
                       Select property type
@@ -317,16 +232,14 @@ const EditProperty: React.FC = () => {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-4" />
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                 </div>
 
-                {/* Select company */}
-                <div className="relative bg-zinc-800 rounded-2xl px-4 py-3 flex items-center">
-                  <span className="text-zinc-400 mr-3"></span>
+                <div className="relative">
                   <select
                     value={form.companyId}
                     onChange={handleCompanyChange}
-                    className="flex-1 bg-neutral-800 outline-none text-sm md:text-base appearance-none pr-6"
+                    className="w-full bg-zinc-800 p-3 rounded-xl appearance-none"
                   >
                     <option value="" disabled>
                       Select company
@@ -337,78 +250,59 @@ const EditProperty: React.FC = () => {
                       </option>
                     ))}
                   </select>
-                  <ChevronDown className="w-4 h-4 text-zinc-400 absolute right-4" />
+                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400" />
                 </div>
               </div>
 
-              {/* RIGHT COLUMN */}
+              {/* RIGHT */}
               <div className="space-y-4">
-                {/* Checkbox: same as company */}
-                <label className="flex items-center gap-2 text-sm text-zinc-200">
+                <label className="flex gap-2 text-sm">
                   <input
                     type="checkbox"
                     checked={form.sameAsCompany}
                     onChange={handleCheckbox("sameAsCompany")}
-                    className="w-4 h-4 rounded border-zinc-500 bg-zinc-800"
                   />
-                  <span>all the data here is the same as company</span>
+                  Same as company owner
                 </label>
 
-                {/* Owner name */}
                 <input
                   type="text"
-                  placeholder="Enter owner name"
                   value={form.ownerName}
                   disabled={form.sameAsCompany}
                   onChange={handleChange("ownerName")}
-                  className={`w-full p-3 rounded-lg ${
-                    form.sameAsCompany
-                      ? "bg-neutral-700 cursor-not-allowed"
-                      : "bg-neutral-800"
-                  }`}
+                  className="w-full bg-zinc-800 p-3 rounded-xl disabled:bg-zinc-700"
                 />
 
-                {/* Return address */}
-                <div className="flex items-center ">
-                  <input
-                    type="text"
-                    placeholder="Enter package return address"
-                    value={form.returnAddress}
-                    disabled={form.sameAsMailing}
-                    onChange={handleChange("returnAddress")}
-                    className={`w-full p-3 rounded-lg ${
-                      form.sameAsMailing
-                        ? "bg-neutral-700 cursor-not-allowed"
-                        : "bg-neutral-800"
-                    }`}
-                  />
-                </div>
+                <input
+                  type="text"
+                  value={form.returnAddress}
+                  disabled={form.sameAsMailing}
+                  onChange={handleChange("returnAddress")}
+                  className="w-full bg-zinc-800 p-3 rounded-xl disabled:bg-zinc-700"
+                />
 
-                {/* Checkbox: same as mailing address */}
-                <label className="flex items-center gap-2 text-sm text-zinc-200">
+                <label className="flex gap-2 text-sm">
                   <input
                     type="checkbox"
                     checked={form.sameAsMailing}
                     onChange={handleCheckbox("sameAsMailing")}
-                    className="w-4 h-4 rounded border-zinc-500 bg-zinc-800"
                   />
-                  <span>same as mailing address</span>
+                  Same as mailing address
                 </label>
               </div>
             </div>
 
-            {/* Buttons */}
-            <div className="flex justify-center gap-6 pt-6">
+            <div className="flex justify-center gap-6">
               <button
                 type="submit"
-                className="px-10 py-3 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-base font-semibold shadow-lg hover:opacity-95 active:translate-y-[1px] transition"
+                className="px-10 py-3 rounded-full bg-indigo-500 font-semibold"
               >
                 Save
               </button>
               <button
                 type="button"
                 onClick={handleCancel}
-                className="px-10 py-3 rounded-full bg-red-500 hover:bg-red-400 text-base font-semibold shadow-lg active:translate-y-[1px] transition"
+                className="px-10 py-3 rounded-full bg-red-500 font-semibold"
               >
                 Cancel
               </button>

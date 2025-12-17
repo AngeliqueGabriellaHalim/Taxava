@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useMemo } from "react";
 import { Navigate, useNavigate } from "react-router-dom";
 import propertiesDB from "../db/property.json";
 import { getCompaniesByUser } from "../utils/getCompany";
@@ -21,6 +21,7 @@ type Property = {
   sameAddress: boolean;
   companyId: number;
 };
+
 const propertyTypes = ["Kos", "Ruko", "Gudang", "Kantor", "Lainnya"];
 
 // Fungsi sederhana untuk mendapatkan ID Property berikutnya
@@ -29,11 +30,10 @@ const getNextPropertyId = (): number => {
   const existingLocal = localStorage.getItem("properties");
   const localProps: Property[] = existingLocal ? JSON.parse(existingLocal) : [];
 
-  const allProps: Property[] = [...(propertiesDB as Property[]), ...localProps];
-
-  if (allProps.length === 0) {
-    return 1;
-  }
+  const allProps: Property[] = [
+    ...(propertiesDB as Property[]), 
+    ...localProps
+  ];
 
   // Cari ID terbesar
   const maxId = allProps.reduce(
@@ -44,10 +44,29 @@ const getNextPropertyId = (): number => {
   return maxId + 1;
 };
 
+type FormState = {
+  name: string;
+  type: string;
+  companyId: string;
+  ownerName: string;
+  returnAddress: string;
+  sameAsCompany: boolean;
+  sameAsMailing: boolean;
+};
+
 const PropertySetup: React.FC = () => {
   const navigate = useNavigate();
 
-  const [formError, setFormError] = useState<string>("");
+  const [formError, setFormError] = useState("");
+  const [form, setForm] = useState<FormState>({
+    name: "",
+    type: "",
+    companyId: "",
+    ownerName: "",
+    returnAddress: "",
+    sameAsCompany: false,
+    sameAsMailing: false,
+  });
 
   // cek user login
   const currentUser: User | null = (() => {
@@ -59,38 +78,21 @@ const PropertySetup: React.FC = () => {
     }
   })();
 
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
+  const userCompanies = useMemo(() => {
+    if (!currentUser) return [];
+    return getCompaniesByUser(currentUser.id);
+  }, [currentUser]);
 
-  const userCompanies = getCompaniesByUser(currentUser.id);
-
-  type FormState = {
-    name: string;
-    type: string;
-    companyId: string; // disimpan sebagai string untuk binding <select>
-    ownerName: string;
-    returnAddress: string;
-    sameAsCompany: boolean;
-    sameAsMailing: boolean;
-  };
-
-  const [form, setForm] = useState<FormState>({
-    name: "",
-    type: "",
-    companyId: "",
-    ownerName: "",
-    returnAddress: "",
-    sameAsCompany: false,
-    sameAsMailing: false,
-  });
-
-  const selectedCompany = userCompanies.find(
-    (c) => c.id === Number(form.companyId)
-  );
+  const selectedCompany = useMemo(() => {
+    return userCompanies.find((c) => c.id === Number(form.companyId));
+  }, [userCompanies, form.companyId]);
 
   // mailingAddress property akan diambil dari company yang dipilih
   const mailingAddress = selectedCompany?.mailingAddress ?? "";
+
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
 
   const handleChange =
     (field: keyof FormState) =>

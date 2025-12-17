@@ -10,24 +10,24 @@ import { loadAllCompanies, saveCompaniesToLocal } from "../utils/getCompany";
 const EditCompany: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
+
   const companyId = id ? parseInt(id) : null;
 
-  const [formData, setFormData] = useState<Company | null>(null);
+  const allCompanies = loadAllCompanies();
+  const foundCompany =
+    companyId !== null
+      ? allCompanies.find((c) => c.id === companyId) ?? null
+      : null;
+
+  const [formData, setFormData] = useState<Company | null>(foundCompany);
   const [errorBanner, setErrorBanner] = useState("");
-  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const all = loadAllCompanies();
-    const found = all.find((c) => c.id === companyId);
-
-    if (found) {
-      setFormData(found);
-    } else {
+    if (!foundCompany) {
       toast.error("Company not found");
       navigate("/manage-companies");
     }
-    setLoading(false);
-  }, [companyId, navigate]);
+  }, [foundCompany, navigate]);
 
   const handleMailingChange = (val: string) => {
     if (!formData) return;
@@ -122,12 +122,6 @@ const EditCompany: React.FC = () => {
     navigate("/manage-companies");
   };
 
-  if (loading)
-    return (
-      <div className="min-h-screen bg-zinc-900 text-white flex justify-center items-center">
-        Loading...
-      </div>
-    );
   if (!formData) return null;
 
   return (
