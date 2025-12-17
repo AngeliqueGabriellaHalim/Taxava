@@ -26,13 +26,9 @@ const Onboarding: React.FC = () => {
   });
   const [currentStep, setCurrentStep] = useState(0);
 
-  // Redirect jika tidak login
-  if (!currentUser) return <Navigate to="/login" replace />;
+   const updateSetupAndStep = useCallback(() => {
+    if (!currentUser) return;
 
-  // Redirect jika sudah onboarding
-  if (currentUser.hasOnboarded) return <Navigate to="/home" replace />;
-
-  const updateSetupAndStep = useCallback(() => {
     const companies = getCompaniesByUser(currentUser.id);
     const properties = getPropertiesByUser(currentUser.id);
 
@@ -50,13 +46,25 @@ const Onboarding: React.FC = () => {
     } else {
       setCurrentStep(0);
     }
-  }, [currentUser.id]);
+  }, [currentUser]);
 
   useEffect(() => {
-    updateSetupAndStep();
-    window.addEventListener("focus", updateSetupAndStep);
-    return () => window.removeEventListener("focus", updateSetupAndStep);
+    const handler = () => updateSetupAndStep();
+
+    setTimeout(handler, 0); 
+    window.addEventListener("focus", handler);
+
+    return () => {
+      window.removeEventListener("focus", handler);
+    };
   }, [updateSetupAndStep, location.key]);
+
+
+  // Redirect jika tidak login
+  if (!currentUser) return <Navigate to="/login" replace />;
+
+  // Redirect jika sudah onboarding
+  if (currentUser.hasOnboarded) return <Navigate to="/home" replace />;
 
   const finalizeOnboarding = () => {
     const allUsers = loadAllUsers();
@@ -64,37 +72,36 @@ const Onboarding: React.FC = () => {
       u.id === currentUser.id ? { ...u, hasOnboarded: true } : u
     );
 
-    // Simpan list user ke localStorage (akan menimpa data JSON saat load)
     saveUsersToLocal(updatedUsers);
-
-    // Update session saat ini
-    const updatedSession = { ...currentUser, hasOnboarded: true };
-    localStorage.setItem("currentUser", JSON.stringify(updatedSession));
+    localStorage.setItem(
+      "currentUser",
+      JSON.stringify({ ...currentUser, hasOnboarded: true })
+    );
 
     navigate("/home", { replace: true });
   };
 
-  const handleFinishOnboarding = () => {
-    if (currentStep === 2) {
-      finalizeOnboarding();
-    }
-  };
-
-  const handleSkip = () => {
-    finalizeOnboarding();
-  };
-
   const handleStepAction = (index: number) => {
     if (index === 0) {
-      setupStatus.hasCompany
-        ? navigate("/manage-companies")
-        : navigate(steps[0].path!);
-    } else if (index === 1) {
-      setupStatus.hasProperty
-        ? navigate("/manage-properties")
-        : navigate(steps[1].path!);
-    } else if (index === 2) {
-      handleFinishOnboarding();
+      if (setupStatus.hasCompany) {
+        navigate("/manage-companies");
+      } else {
+        navigate(steps[0].path!);
+      }
+      return;
+    }
+
+    if (index === 1) {
+      if (setupStatus.hasProperty) {
+        navigate("/manage-properties");
+      } else {
+        navigate(steps[1].path!);
+      }
+      return;
+    }
+
+    if (index === 2 && currentStep === 2) {
+      finalizeOnboarding();
     }
   };
 
@@ -103,7 +110,7 @@ const Onboarding: React.FC = () => {
       <Navbar />
       <div className="min-h-screen bg-neutral-900 text-white px-6 py-10 relative">
         <p
-          onClick={handleSkip}
+          onClick={finalizeOnboarding}
           className="absolute top-6 right-8 text-sm underline text-neutral-300 hover:text-white transition cursor-pointer text-right"
         >
           I’d like to skip and <br /> go to main dashboard.

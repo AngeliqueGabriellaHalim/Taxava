@@ -15,8 +15,7 @@ type User = {
 const ManageProperties: React.FC = () => {
   const [search, setSearch] = useState("");
   const [sortAsc, setSortAsc] = useState(true);
-
-  const navigate = useNavigate(); //  inisialisasi navigate()
+  const navigate = useNavigate();
 
   // ambil user yang sedang login dari localStorage
   const currentUser: User | null = (() => {
@@ -28,16 +27,20 @@ const ManageProperties: React.FC = () => {
     }
   })();
 
-  if (!currentUser) {
-    return <Navigate to="/login" replace />;
-  }
+  const userCompanies = useMemo(() => {
+    if (!currentUser) return [];
+    return getCompaniesByUser(currentUser.id);
+  }, [currentUser]);
 
-  const userCompanies = getCompaniesByUser(currentUser.id);
+  const propertiesOwned = useMemo(() => {
+    if (!currentUser) return [];
+    return getPropertiesByUser(currentUser.id);
+  }, [currentUser])
 
-  const propertiesOwned = getPropertiesByUser(currentUser.id);
   // search + sort
   const filteredProperties = useMemo(() => {
-    const lower = search.toLowerCase();
+    const lower = search.toLowerCase().trim();
+
     const filtered = propertiesOwned.filter((p) =>
       p.name.toLowerCase().includes(lower)
     );
@@ -47,6 +50,10 @@ const ManageProperties: React.FC = () => {
     );
   }, [propertiesOwned, search, sortAsc]);
 
+  if (!currentUser) {
+    return <Navigate to="/login" replace />;
+  }
+  
   // CLICK HANDLERS
   const handleAdd = () => {
     navigate("/property-setup"); //  pindah ke halaman setup property
