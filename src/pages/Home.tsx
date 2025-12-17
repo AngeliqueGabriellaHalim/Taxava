@@ -13,14 +13,6 @@ type User = {
 };
 const Home: React.FC = () => {
   const navigate = useNavigate();
-
-  const handleCompany = () => {
-    navigate("/manage-companies");
-  };
-
-  const handleProperty = () => {
-    navigate("/manage-properties");
-  };
   // ambil user yang sedang login dari localStorage
   const currentUser: User | null = (() => {
     try {
@@ -81,7 +73,7 @@ const Home: React.FC = () => {
             <button
               type="button"
               onClick={handleCompanyAction}
-              className="px-10 py-2 rounded-full bg-[#7C3AED] text-sm font-semibold hover:opacity-90 active:translate-y-[1px] transition cursor-pointer"
+              className="px-10 py-2 rounded-full bg-[#7C3AED] text-sm font-semibold hover:opacity-90 active:translate-y-px transition cursor-pointer"
             >
               {hasCompany ? "View" : "Add Company"}
             </button>

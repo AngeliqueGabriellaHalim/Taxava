@@ -47,9 +47,6 @@ const EditProperty: React.FC = () => {
   const userCompanies = getCompaniesByUser(currentUser.id);
 
   const loadAllProperties = (): Property[] => {
-    const localRaw = localStorage.getItem("properties");
-    const localProps: Property[] = localRaw ? JSON.parse(localRaw) : [];
-
     // Gabungkan seed + local dalam urutan (seed dulu, lalu local)
     const allProps = getPropertiesByUser(currentUser.id);
 
@@ -105,7 +102,15 @@ const EditProperty: React.FC = () => {
       returnAddress: property.returnAddress,
       sameAsMailing: property.sameAddress,
     }),
-    [propertyId]
+    [
+      propertyId,
+      property.name,
+      property.type,
+      property.companyId,
+      property.returnAddress,
+      property.sameAddress,
+      propertyCompany.ownerName,
+    ]
   ); // Hanya bergantung pada propertyId
 
   useEffect(() => {

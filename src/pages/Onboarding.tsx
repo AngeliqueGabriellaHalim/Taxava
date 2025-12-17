@@ -1,9 +1,13 @@
 import React, { useState, useEffect, useCallback } from "react";
-import { Link, useNavigate, Navigate, useLocation } from "react-router-dom";
+import { useNavigate, Navigate, useLocation } from "react-router-dom";
 import Navbar from "../component/Navbar";
 import { getCompaniesByUser } from "../utils/getCompany";
 import { getPropertiesByUser } from "../utils/getProperty";
-import { getCurrentUser, loadAllUsers, saveUsersToLocal } from "../utils/getUser";
+import {
+  getCurrentUser,
+  loadAllUsers,
+  saveUsersToLocal,
+} from "../utils/getUser";
 
 const steps = [
   { title: "Company Setup", path: "/company-setup" },
@@ -16,7 +20,10 @@ const Onboarding: React.FC = () => {
   const location = useLocation();
   const currentUser = getCurrentUser();
 
-  const [setupStatus, setSetupStatus] = useState({ hasCompany: false, hasProperty: false });
+  const [setupStatus, setSetupStatus] = useState({
+    hasCompany: false,
+    hasProperty: false,
+  });
   const [currentStep, setCurrentStep] = useState(0);
 
   // Redirect jika tidak login
@@ -79,9 +86,13 @@ const Onboarding: React.FC = () => {
 
   const handleStepAction = (index: number) => {
     if (index === 0) {
-      setupStatus.hasCompany ? navigate("/manage-companies") : navigate(steps[0].path!);
+      setupStatus.hasCompany
+        ? navigate("/manage-companies")
+        : navigate(steps[0].path!);
     } else if (index === 1) {
-      setupStatus.hasProperty ? navigate("/manage-properties") : navigate(steps[1].path!);
+      setupStatus.hasProperty
+        ? navigate("/manage-properties")
+        : navigate(steps[1].path!);
     } else if (index === 2) {
       handleFinishOnboarding();
     }
@@ -99,9 +110,12 @@ const Onboarding: React.FC = () => {
         </p>
 
         <div className="mt-20 text-center">
-          <h1 className="text-4xl font-bold mb-4">Welcome to your onboarding dashboard</h1>
+          <h1 className="text-4xl font-bold mb-4">
+            Welcome to your onboarding dashboard
+          </h1>
           <p className="text-neutral-300 text-sm max-w-xl mx-auto">
-            Let’s set up your company and properties to start managing your assets efficiently.
+            Let’s set up your company and properties to start managing your
+            assets efficiently.
           </p>
         </div>
 
@@ -109,37 +123,58 @@ const Onboarding: React.FC = () => {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className={`w-10 h-10 rounded-full transition ${i <= currentStep ? "bg-violet-500 shadow-[0_0_15px_rgba(139,92,246,0.5)]" : "bg-neutral-700"
-                }`}
+              className={`w-10 h-10 rounded-full transition ${
+                i <= currentStep
+                  ? "bg-violet-500 shadow-[0_0_15px_rgba(139,92,246,0.5)]"
+                  : "bg-neutral-700"
+              }`}
             ></div>
           ))}
         </div>
 
         <div className="flex justify-center gap-8 flex-wrap mt-6">
           {steps.map((step, index) => {
-            const isDisabled = (index === 1 && currentStep < 1) || (index === 2 && currentStep < 2);
+            const isDisabled =
+              (index === 1 && currentStep < 1) ||
+              (index === 2 && currentStep < 2);
             const buttonLabel =
-              index === 2 ? "Complete set up" : index < currentStep ? "View" : "Get Started";
+              index === 2
+                ? "Complete set up"
+                : index < currentStep
+                ? "View"
+                : "Get Started";
 
             return (
               <div
                 key={index}
                 className="bg-neutral-800/80 w-64 h-48 rounded-xl p-6 flex flex-col items-center justify-between shadow-lg"
               >
-                <h2 className="text-lg font-semibold text-center">{step.title}</h2>
+                <h2 className="text-lg font-semibold text-center">
+                  {step.title}
+                </h2>
                 <p className="text-xs text-zinc-400">
-                  {index === 0 && (setupStatus.hasCompany ? "Status: Completed" : "Status: Pending")}
-                  {index === 1 && (setupStatus.hasProperty ? "Status: Completed" : "Status: Pending")}
-                  {index === 2 && (currentStep === 2 ? "Ready to Finish" : "Pending Requirements")}
+                  {index === 0 &&
+                    (setupStatus.hasCompany
+                      ? "Status: Completed"
+                      : "Status: Pending")}
+                  {index === 1 &&
+                    (setupStatus.hasProperty
+                      ? "Status: Completed"
+                      : "Status: Pending")}
+                  {index === 2 &&
+                    (currentStep === 2
+                      ? "Ready to Finish"
+                      : "Pending Requirements")}
                 </p>
 
                 <button
                   onClick={() => handleStepAction(index)}
                   disabled={isDisabled}
-                  className={`w-full h-12 rounded-full text-sm font-semibold transition shadow-lg ${isDisabled
-                    ? "bg-neutral-600 opacity-40 cursor-not-allowed"
-                    : "bg-violet-500 hover:opacity-90 active:scale-95"
-                    }`}
+                  className={`w-full h-12 rounded-full text-sm font-semibold transition shadow-lg ${
+                    isDisabled
+                      ? "bg-neutral-600 opacity-40 cursor-not-allowed"
+                      : "bg-violet-500 hover:opacity-90 active:scale-95"
+                  }`}
                 >
                   {buttonLabel}
                 </button>
