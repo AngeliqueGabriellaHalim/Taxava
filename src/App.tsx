@@ -15,8 +15,6 @@ import EditProperty from "./pages/EditProperty.tsx";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
-// import MainLayout from "./component/MainLayout";
-
 export default function App() {
   return (
     <BrowserRouter>
@@ -26,11 +24,6 @@ export default function App() {
         <Route path="/createaccount" element={<CreateAccount />} />
         <Route path="/forgotpassword" element={<ForgotPassword />} />
         <Route path="/checkemail" element={<CheckEmail />} />
-        {/* Di bawah ini buat pages yang pengen paling atas nya ada navbar*/}
-        {/* <Route path="/" element={<MainLayout />}>
-          <Route path="/onboardingdb" element={<Onboarding />} />
-          <Route path="/" element={<Homepage />} />
-        </Route> */}
         <Route path="/onboardingdb" element={<Onboarding />} />
         <Route path="/company-setup" element={<CompanySetup />} />
         <Route path="/property-setup" element={<PropertySetup />} />

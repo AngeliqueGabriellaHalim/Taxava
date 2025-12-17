@@ -7,12 +7,11 @@ const ForgotPassword: React.FC = () => {
   const [email, setEmail] = useState("");
   const navigate = useNavigate();
 
-  const handleSubmit=(e:FormEvent)=>{
+  const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-     toast.success("If the email exists, a reset link has been sent.");
-     navigate("/checkemail")
-
-  }
+    toast.success("If the email exists, a reset link has been sent.");
+    navigate("/checkemail");
+  };
   return (
     <div className="min-h-screen bg-neutral-900 text-white flex items-center justify-center px-6 relative">
       {/* Logo */}
@@ -47,7 +46,7 @@ const ForgotPassword: React.FC = () => {
 
           <button
             type="submit"
-            className="w-full h-12 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg active:translate-y-[1px] hover:opacity-95 transition cursor-pointer"
+            className="w-full h-12 rounded-full bg-linear-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg active:translate-y-px hover:opacity-95 transition cursor-pointer"
           >
             Send Email
           </button>

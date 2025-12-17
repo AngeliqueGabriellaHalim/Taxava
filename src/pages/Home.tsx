@@ -35,7 +35,7 @@ const Home: React.FC = () => {
     if (hasCompany) {
       navigate("/manage-companies");
     } else {
-      navigate("/company-setup"); // atau route untuk add company
+      navigate("/company-setup");
     }
   };
 
@@ -43,7 +43,7 @@ const Home: React.FC = () => {
     if (hasProperty) {
       navigate("/manage-properties");
     } else {
-      navigate("/property-setup"); // atau route untuk add property
+      navigate("/property-setup");
     }
   };
 
@@ -55,7 +55,7 @@ const Home: React.FC = () => {
         <div className="flex flex-col md:flex-row gap-64">
           {/* COMPANY CARD */}
           <div className="w-72 h-80 rounded-3xl bg-[#33343A] flex flex-col items-center justify-between py-10 shadow-lg">
-            {/* Indicator - filled jika ada company, outline jika belum */}
+            {/* filled jika ada company, outline jika belum */}
             {hasCompany ? (
               <div className="w-4 h-4 rounded-full bg-[#7C3AED]" />
             ) : (
@@ -81,7 +81,7 @@ const Home: React.FC = () => {
 
           {/* PROPERTY CARD */}
           <div className="w-72 h-80 rounded-3xl bg-[#33343A] flex flex-col items-center justify-between py-10 shadow-lg">
-            {/* Indicator - filled jika ada property, outline jika belum */}
+            {/* filled jika ada property, outline jika belum */}
             {hasProperty ? (
               <div className="w-4 h-4 rounded-full bg-[#7C3AED]" />
             ) : (
@@ -99,7 +99,7 @@ const Home: React.FC = () => {
             <button
               type="button"
               onClick={handlePropertyAction}
-              className="px-10 py-2 rounded-full bg-[#7C3AED] text-sm font-semibold hover:opacity-90 active:translate-y-[1px] transition"
+              className="px-10 py-2 rounded-full bg-[#7C3AED] text-sm font-semibold hover:opacity-90 active:translate-y-px transition"
             >
               {hasProperty ? "View" : "Add Property"}
             </button>

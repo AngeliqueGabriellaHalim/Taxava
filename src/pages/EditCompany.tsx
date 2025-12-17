@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "../component/Navbar";
-// import { Company, loadAllCompanies, saveCompaniesToLocal } from "../utils/getCompany";
 
 import type { Company } from "../utils/getCompany";
 import { loadAllCompanies, saveCompaniesToLocal } from "../utils/getCompany";
@@ -96,7 +95,7 @@ const EditCompany: React.FC = () => {
       setErrorBanner("Phone must be numbers only.");
       return false;
     }
-    // Regex email umum (tanpa paksaan .com)
+    // Regex email umum
     if (!/^\S+@\S+\.\S+$/.test(ownerEmail)) {
       setErrorBanner("Please enter a valid email address.");
       return false;

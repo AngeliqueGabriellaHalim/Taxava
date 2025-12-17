@@ -16,8 +16,8 @@ const ManageCompanies: React.FC = () => {
   const [sortAsc, setSortAsc] = useState(true);
   const navigate = useNavigate();
 
-  // ----- ambil user yang sedang login dari localStorage -----
-    const currentUser: User | null = (() => {
+  // ambil user yang sedang login dari localStorage
+  const currentUser: User | null = (() => {
     try {
       const raw = localStorage.getItem("currentUser");
       return raw ? (JSON.parse(raw) as User) : null;
@@ -28,7 +28,7 @@ const ManageCompanies: React.FC = () => {
 
   const isAuthenticated = Boolean(currentUser);
 
-   const userCompanies = useMemo(() => {
+  const userCompanies = useMemo(() => {
     if (!currentUser) return [];
     return getCompaniesByUser(currentUser.id);
   }, [currentUser]);
@@ -41,9 +41,7 @@ const ManageCompanies: React.FC = () => {
     );
 
     return result.sort((a, b) =>
-      sortAsc
-        ? a.name.localeCompare(b.name)
-        : b.name.localeCompare(a.name)
+      sortAsc ? a.name.localeCompare(b.name) : b.name.localeCompare(a.name)
     );
   }, [userCompanies, search, sortAsc]);
 
@@ -67,7 +65,7 @@ const ManageCompanies: React.FC = () => {
       {/* Main content */}
       <div className="flex justify-center px-4 py-8">
         <div className="w-full max-w-5xl pt-15">
-          {/* Logo (tetap seperti semula) */}
+          {/* Logo */}
           <div className="mb-6 justify-start">
             <span className="tracking-[0.3em] text-xl font-semibold">
               TAXAVA

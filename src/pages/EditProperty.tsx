@@ -6,7 +6,7 @@ import Navbar from "../component/Navbar";
 import { getCompaniesByUser } from "../utils/getCompany";
 import type { Company } from "../utils/getCompany";
 
-/* ================= TYPES ================= */
+/* TYPES */
 
 type User = {
   id: number;
@@ -139,9 +139,7 @@ const EditProperty: React.FC = () => {
       }
     };
 
-  const handleCompanyChange = (
-    e: React.ChangeEvent<HTMLSelectElement>
-  ) => {
+  const handleCompanyChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     setForm({
       ...form,
       companyId: e.target.value,
@@ -170,16 +168,12 @@ const EditProperty: React.FC = () => {
       type: form.type,
       owner: form.ownerName,
       ownerEmail: form.ownerEmail,
-      returnAddress: form.sameAsMailing
-        ? mailingAddress
-        : form.returnAddress,
+      returnAddress: form.sameAsMailing ? mailingAddress : form.returnAddress,
       sameAddress: form.sameAsMailing,
       companyId: selectedCompany.id,
     };
 
-    const next = properties.map((p) =>
-      p.id === updated.id ? updated : p
-    );
+    const next = properties.map((p) => (p.id === updated.id ? updated : p));
 
     localStorage.setItem("properties", JSON.stringify(next));
     toast.success("Property updated successfully");
@@ -192,9 +186,7 @@ const EditProperty: React.FC = () => {
 
       <div className="flex justify-center px-4 py-10">
         <div className="w-full max-w-4xl">
-          <h1 className="text-4xl font-bold text-center mb-8">
-            Edit Property
-          </h1>
+          <h1 className="text-4xl font-bold text-center mb-8">Edit Property</h1>
 
           {form.error && (
             <div className="mb-6 bg-zinc-800 text-red-300 px-4 py-3 rounded-xl">

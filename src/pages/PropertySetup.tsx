@@ -24,16 +24,12 @@ type Property = {
 
 const propertyTypes = ["Kos", "Ruko", "Gudang", "Kantor", "Lainnya"];
 
-// Fungsi sederhana untuk mendapatkan ID Property berikutnya
 const getNextPropertyId = (): number => {
   // Ambil semua properties (dari JSON dan Local Storage)
   const existingLocal = localStorage.getItem("properties");
   const localProps: Property[] = existingLocal ? JSON.parse(existingLocal) : [];
 
-  const allProps: Property[] = [
-    ...(propertiesDB as Property[]), 
-    ...localProps
-  ];
+  const allProps: Property[] = [...(propertiesDB as Property[]), ...localProps];
 
   // Cari ID terbesar
   const maxId = allProps.reduce(
@@ -220,7 +216,7 @@ const PropertySetup: React.FC = () => {
       <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
         {/* Card utama */}
         <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10 relative">
-          {/* LOGO — selalu di ujung kiri atas card */}
+          {/* LOGO */}
           <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
 
           {/* HEADER */}
@@ -231,7 +227,6 @@ const PropertySetup: React.FC = () => {
             {/* Judul di tengah */}
             <h1 className="text-3xl font-bold text-center">Property Setup</h1>
 
-            {/* Dummy kanan (tempat tombol Add kalau nanti kamu pakai lagi) */}
             <div className="w-32 opacity-0"></div>
           </div>
 
