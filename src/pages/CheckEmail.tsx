@@ -20,7 +20,7 @@ const CheckEmail: React.FC = () => {
         <button
           type="button"
           onClick={() => navigate("/login")} // balik ke halaman login/home
-          className="mt-4 px-8 h-10 rounded-full bg-gradient-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg hover:opacity-95 active:translate-y-[1px] transition"
+          className="mt-4 px-8 h-10 rounded-full bg-linear-to-r from-violet-500 to-indigo-500 text-sm font-semibold shadow-lg hover:opacity-95 active:translate-y-px transition"
         >
           Back to Login Page
         </button>

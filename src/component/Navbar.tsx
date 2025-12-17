@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
-  // Logout: cukup hapus currentUser
+  // Logout dengan hapus currentuser dari localstorage
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
     navigate("/login");
@@ -23,7 +23,7 @@ const Navbar: React.FC = () => {
 
   return (
     <nav className="w-full bg-zinc-950 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50">
-      {/* Logo → Home */}
+      {/* Logo navigate ke Home */}
       <button
         onClick={handleHome}
         className="text-xl font-bold tracking-[0.3em] cursor-pointer"

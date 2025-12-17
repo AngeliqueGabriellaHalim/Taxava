@@ -19,7 +19,7 @@ const CompanySetup: React.FC = () => {
   const [ownerEmail, setOwnerEmail] = useState("");
   const [errorBanner, setErrorBanner] = useState("");
 
-  // Handlers
+  // Handlers method
   const handleSameAddress = () => {
     if (!mailingAddress.trim()) {
       setErrorBanner("Please fill mailing address first.");
@@ -42,7 +42,7 @@ const CompanySetup: React.FC = () => {
     if (sameAddress) setReturnAddress(value);
   };
 
-  // Validasi (Error pakai banner, Sukses pakai toast)
+  // Validasi (Error pakai banner sesuai req, sukses pakai toast)
   const validateData = useCallback(() => {
     setErrorBanner("");
 
@@ -70,7 +70,7 @@ const CompanySetup: React.FC = () => {
       return false;
     }
 
-    // Regex email umum (tanpa paksaan .com)
+    // Regex email umum
     if (!/^\S+@\S+\.\S+$/.test(ownerEmail)) {
       setErrorBanner("Please enter a valid email address.");
       return false;
@@ -152,7 +152,7 @@ const CompanySetup: React.FC = () => {
             </button>
           </div>
 
-          {/* Error Banner */}
+          {/* Error banner top of page */}
           {errorBanner && (
             <div className="bg-red-700/50 p-3 rounded-lg mb-8 text-sm text-white font-semibold">
               {errorBanner}
@@ -161,7 +161,7 @@ const CompanySetup: React.FC = () => {
 
           {/* grid 2 kolom */}
           <div className="grid grid-cols-2 gap-x-10 mb-20">
-            {/* company Name full width */}
+            {/* company name full width */}
             <div className="col-span-2 mb-8">
               <label className="block mb-2 font-semibold">
                 Enter company name

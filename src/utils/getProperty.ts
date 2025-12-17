@@ -45,6 +45,6 @@ export function getPropertiesByUser(userId: number): Property[] {
   // gunakan loadAllProperties untuk menghindari duplikasi
   const allProperties = loadAllProperties();
 
-  // filter: hanya yg sesuai dengan companyId user
+  // filter hanya yg sesuai dengan companyId user
   return allProperties.filter((p) => ownedCompanyIds.includes(p.companyId));
 }
