@@ -2,9 +2,11 @@ import React, { useEffect, useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
-import { getCompaniesByUser } from "../utils/getCompany";
-import { getPropertiesByUser } from "../utils/getProperty";
 import Navbar from "../component/Navbar";
+import { getCompaniesByUser } from "../utils/getCompany";
+import type { Company } from "../utils/getCompany";
+
+/* ================= TYPES ================= */
 
 type User = {
   id: number;
@@ -18,16 +20,10 @@ type Property = {
   name: string;
   type: string;
   owner: string;
+  ownerEmail: string;
   returnAddress: string;
   sameAddress: boolean;
   companyId: number;
-};
-
-type Company = {
-  id: number;
-  name: string;
-  ownerName: string;
-  mailingAddress: string;
 };
 
 type FormState = {
@@ -35,6 +31,7 @@ type FormState = {
   type: string;
   companyId: string;
   ownerName: string;
+  ownerEmail: string;
   returnAddress: string;
   sameAsCompany: boolean;
   sameAsMailing: boolean;
@@ -61,25 +58,30 @@ const EditProperty: React.FC = () => {
     ? getCompaniesByUser(currentUser.id)
     : [];
 
-  const properties: Property[] = currentUser
-    ? getPropertiesByUser(currentUser.id)
-    : [];
+  const properties: Property[] = (() => {
+    try {
+      const raw = localStorage.getItem("properties");
+      return raw ? JSON.parse(raw) : [];
+    } catch {
+      return [];
+    }
+  })();
 
   const property = properties.find((p) => p.id === propertyId) ?? null;
   const propertyCompany =
-    property &&
-    userCompanies.find((c) => c.id === property.companyId);
+    property && userCompanies.find((c) => c.id === property.companyId);
 
-    const [form, setForm] = useState<FormState | null>(() => {
+  const [form, setForm] = useState<FormState | null>(() => {
     if (!property || !propertyCompany) return null;
 
     return {
       name: property.name,
       type: property.type,
       companyId: String(property.companyId),
-      ownerName: propertyCompany.ownerName,
+      ownerName: property.owner,
+      ownerEmail: property.ownerEmail,
       returnAddress: property.returnAddress,
-        sameAsCompany: false,
+      sameAsCompany: false,
       sameAsMailing: property.sameAddress,
       error: "",
     };
@@ -92,7 +94,7 @@ const EditProperty: React.FC = () => {
     }
 
     if (!property || !propertyCompany) {
-      toast.error("Property not found or not accessible");
+      toast.error("Property not found");
       navigate("/manage-properties", { replace: true });
     }
   }, [currentUser, property, propertyCompany, navigate]);
@@ -116,27 +118,25 @@ const EditProperty: React.FC = () => {
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const checked = e.target.checked;
 
-      if (field === "sameAsCompany" && checked && selectedCompany) {
+      if (field === "sameAsCompany" && selectedCompany) {
         setForm({
           ...form,
-          sameAsCompany: true,
-          ownerName: selectedCompany.ownerName,
+          sameAsCompany: checked,
+          ownerName: checked ? selectedCompany.ownerName : form.ownerName,
+          ownerEmail: checked ? selectedCompany.ownerEmail : form.ownerEmail,
           error: "",
         });
         return;
       }
 
-      if (field === "sameAsMailing" && checked) {
+      if (field === "sameAsMailing") {
         setForm({
           ...form,
-          sameAsMailing: true,
-          returnAddress: mailingAddress,
+          sameAsMailing: checked,
+          returnAddress: checked ? mailingAddress : form.returnAddress,
           error: "",
         });
-        return;
       }
-
-      setForm({ ...form, [field]: checked, error: "" });
     };
 
   const handleCompanyChange = (
@@ -149,10 +149,6 @@ const EditProperty: React.FC = () => {
       sameAsMailing: false,
       error: "",
     });
-  };
-
-  const handleCancel = () => {
-    navigate("/manage-properties");
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -173,6 +169,7 @@ const EditProperty: React.FC = () => {
       name: form.name,
       type: form.type,
       owner: form.ownerName,
+      ownerEmail: form.ownerEmail,
       returnAddress: form.sameAsMailing
         ? mailingAddress
         : form.returnAddress,
@@ -301,7 +298,7 @@ const EditProperty: React.FC = () => {
               </button>
               <button
                 type="button"
-                onClick={handleCancel}
+                onClick={() => navigate("/manage-properties")}
                 className="px-10 py-3 rounded-full bg-red-500 font-semibold"
               >
                 Cancel
