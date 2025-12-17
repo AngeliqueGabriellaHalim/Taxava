@@ -5,7 +5,7 @@ import { getCompaniesByUser } from "../utils/getCompany";
 import { getPropertiesByUser } from "../utils/getProperty";
 import { getCurrentUser, loadAllUsers, saveUsersToLocal } from "../utils/getUser";
 
-const steps = [                            
+const steps = [
   { title: "Company Setup", path: "/company-setup" },
   { title: "Property Setup", path: "/property-setup" },
   { title: "You're all set !" },
@@ -13,15 +13,15 @@ const steps = [
 
 const Onboarding: React.FC = () => {
   const navigate = useNavigate();
-  const location = useLocation();  
-  const currentUser = getCurrentUser();         
+  const location = useLocation();
+  const currentUser = getCurrentUser();
 
   const [setupStatus, setSetupStatus] = useState({ hasCompany: false, hasProperty: false });
   const [currentStep, setCurrentStep] = useState(0);
 
   // Redirect jika tidak login
   if (!currentUser) return <Navigate to="/login" replace />;
-  
+
   // Redirect jika sudah onboarding
   if (currentUser.hasOnboarded) return <Navigate to="/home" replace />;
 
@@ -47,14 +47,11 @@ const Onboarding: React.FC = () => {
 
   useEffect(() => {
     updateSetupAndStep();
-    window.addEventListener('focus', updateSetupAndStep);
-    return () => window.removeEventListener('focus', updateSetupAndStep);
+    window.addEventListener("focus", updateSetupAndStep);
+    return () => window.removeEventListener("focus", updateSetupAndStep);
   }, [updateSetupAndStep, location.key]);
 
-  const handleFinishOnboarding = () => {
-    if (currentStep !== 2) return;
-
-    // ambil semua user (JSON + Local), update yang sedang login, simpan kembali ke Local
+  const finalizeOnboarding = () => {
     const allUsers = loadAllUsers();
     const updatedUsers = allUsers.map((u) =>
       u.id === currentUser.id ? { ...u, hasOnboarded: true } : u
@@ -69,11 +66,15 @@ const Onboarding: React.FC = () => {
 
     navigate("/home", { replace: true });
   };
-  const handleSkip =()=>{
-    localStorage.removeItem("curentUser")
-     const updatedSession = { ...currentUser, hasOnboarded: true };
-    localStorage.setItem("currentUser", JSON.stringify(updatedSession));
-    navigate("/home");
+
+  const handleFinishOnboarding = () => {
+    if (currentStep === 2) {
+      finalizeOnboarding();
+    }
+  };
+
+  const handleSkip = () => {
+    finalizeOnboarding();
   };
 
   const handleStepAction = (index: number) => {
@@ -90,7 +91,10 @@ const Onboarding: React.FC = () => {
     <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
       <Navbar />
       <div className="min-h-screen bg-neutral-900 text-white px-6 py-10 relative">
-        <p onClick={handleSkip} className="absolute top-6 right-8 text-sm underline text-neutral-300 hover:text-white transition cursor-pointer">
+        <p
+          onClick={handleSkip}
+          className="absolute top-6 right-8 text-sm underline text-neutral-300 hover:text-white transition cursor-pointer text-right"
+        >
           I’d like to skip and <br /> go to main dashboard.
         </p>
 
@@ -103,17 +107,25 @@ const Onboarding: React.FC = () => {
 
         <div className="flex items-center justify-center gap-20 mt-16 mb-10">
           {[0, 1, 2].map((i) => (
-            <div key={i} className={`w-10 h-10 rounded-full transition ${i <= currentStep ? "bg-violet-500" : "bg-neutral-700"}`}></div>
+            <div
+              key={i}
+              className={`w-10 h-10 rounded-full transition ${i <= currentStep ? "bg-violet-500 shadow-[0_0_15px_rgba(139,92,246,0.5)]" : "bg-neutral-700"
+                }`}
+            ></div>
           ))}
         </div>
 
         <div className="flex justify-center gap-8 flex-wrap mt-6">
           {steps.map((step, index) => {
             const isDisabled = (index === 1 && currentStep < 1) || (index === 2 && currentStep < 2);
-            const buttonLabel = index === 2 ? "Complete set up" : (index < currentStep ? "View" : "Get Started");
+            const buttonLabel =
+              index === 2 ? "Complete set up" : index < currentStep ? "View" : "Get Started";
 
             return (
-              <div key={index} className="bg-neutral-800/80 w-64 h-48 rounded-xl p-6 flex flex-col items-center justify-between shadow-lg">
+              <div
+                key={index}
+                className="bg-neutral-800/80 w-64 h-48 rounded-xl p-6 flex flex-col items-center justify-between shadow-lg"
+              >
                 <h2 className="text-lg font-semibold text-center">{step.title}</h2>
                 <p className="text-xs text-zinc-400">
                   {index === 0 && (setupStatus.hasCompany ? "Status: Completed" : "Status: Pending")}
@@ -124,7 +136,9 @@ const Onboarding: React.FC = () => {
                 <button
                   onClick={() => handleStepAction(index)}
                   disabled={isDisabled}
-                  className={`w-full h-12 rounded-full text-sm font-semibold transition shadow-lg ${isDisabled ? "bg-neutral-600 opacity-40 cursor-not-allowed" : "bg-violet-500 hover:opacity-90"
+                  className={`w-full h-12 rounded-full text-sm font-semibold transition shadow-lg ${isDisabled
+                    ? "bg-neutral-600 opacity-40 cursor-not-allowed"
+                    : "bg-violet-500 hover:opacity-90 active:scale-95"
                     }`}
                 >
                   {buttonLabel}
