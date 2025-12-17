@@ -132,29 +132,20 @@ const CompanySetup: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
+    <div className="min-h-screen bg-linear-to-r/hsl from-[#191A1F] from-15% to-[#06012F]  text-white flex flex-col">
       {/* navbar */}
       <Navbar />
-      <div className="min-h-screen bg-neutral-900 text-white px-6 py-14 flex justify-center">
+      <div className="min-h-screen bg-linear-to-r/hsl from-[#191A1F] from-15% to-[#06012F]  text-white px-6 py-14 flex justify-center">
         {/* card utama */}
-        <div className="bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10">
+        <div className="bg-zinc-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10">
           {/* header */}
-          <div className="flex justify-between items-center mb-12">
-            <div className="text-xl tracking-[0.3em] font-semibold">TAXAVA</div>
-
-            <h1 className="text-3xl font-bold">Company Setup</h1>
-
-            <button
-              onClick={handleAddCompany}
-              className="bg-violet-500 px-5 py-2 rounded-full text-sm font-semibold shadow-lg hover:opacity-90"
-            >
-              Add Company
-            </button>
+          <div className="flex justify-center items-center mb-12">
+            <h1 className="text-4xl font-bold">Company Setup</h1>
           </div>
 
           {/* Error banner top of page */}
           {errorBanner && (
-            <div className="bg-red-700/50 p-3 rounded-lg mb-8 text-sm text-white font-semibold">
+            <div className="bg-red-700/50 p-3 rounded-lg mb-8 text-md text-white font-semibold">
               {errorBanner}
             </div>
           )}
@@ -163,15 +154,15 @@ const CompanySetup: React.FC = () => {
           <div className="grid grid-cols-2 gap-x-10 mb-20">
             {/* company name full width */}
             <div className="col-span-2 mb-8">
-              <label className="block mb-2 font-semibold">
-                Enter company name
+              <label className="block mb-2 font-semibold text-md">
+                Company Name
               </label>
               <input
                 type="text"
                 value={companyName}
                 onChange={(e) => setCompanyName(e.target.value)}
                 placeholder="Enter company name"
-                className="bg-neutral-800 w-full p-3 rounded-lg"
+                className="bg-zinc-800 w-full p-3 rounded-lg"
               />
             </div>
 
@@ -182,7 +173,7 @@ const CompanySetup: React.FC = () => {
                 value={companyNumber}
                 onChange={(e) => setCompanyNumber(e.target.value)}
                 placeholder="Enter company number"
-                className="bg-neutral-800 w-full p-3 rounded-lg"
+                className="bg-zinc-800 w-full p-3 rounded-lg"
               />
 
               <input
@@ -190,7 +181,7 @@ const CompanySetup: React.FC = () => {
                 value={mailingAddress}
                 onChange={(e) => handleMailingChange(e.target.value)}
                 placeholder="Enter mailing address"
-                className="bg-neutral-800 w-full p-3 rounded-lg"
+                className="bg-zinc-800 w-full p-3 rounded-lg"
               />
 
               <input
@@ -200,17 +191,16 @@ const CompanySetup: React.FC = () => {
                 placeholder="Enter package return address"
                 disabled={sameAddress}
                 className={`w-full p-3 rounded-lg ${
-                  sameAddress
-                    ? "bg-neutral-700 cursor-not-allowed"
-                    : "bg-neutral-800"
+                  sameAddress ? "bg-zinc-700 cursor-not-allowed" : "bg-zinc-800"
                 }`}
               />
 
-              <label className="flex items-center text-sm gap-2 cursor-pointer mt-2">
+              <label className="flex items-center text-sm gap-2 cursor-pointer ml-2">
                 <input
                   type="checkbox"
                   checked={sameAddress}
                   onChange={handleSameAddress}
+                  className="cursor-pointer"
                 />
                 Same as mailing address
               </label>
@@ -223,7 +213,7 @@ const CompanySetup: React.FC = () => {
                 value={ownerName}
                 onChange={(e) => setOwnerName(e.target.value)}
                 placeholder="Enter owner's name"
-                className="bg-neutral-800 w-full p-3 rounded-lg"
+                className="bg-zinc-800 w-full p-3 rounded-lg"
               />
 
               <input
@@ -231,23 +221,29 @@ const CompanySetup: React.FC = () => {
                 value={ownerEmail}
                 onChange={(e) => setOwnerEmail(e.target.value)}
                 placeholder="Enter owner's email"
-                className="bg-neutral-800 w-full p-3 rounded-lg"
+                className="bg-zinc-800 w-full p-3 rounded-lg"
               />
             </div>
           </div>
 
           {/* buttons bawah */}
           <div className="flex justify-center gap-8">
-            <button
+            {/* <button
               onClick={() => navigate("/onboarding", { replace: true })}
               className="bg-violet-600 px-8 py-3 rounded-full font-semibold hover:opacity-90"
             >
               Finish Set Up
+            </button> */}
+            <button
+              onClick={handleAddCompany}
+              className="bg-violet-500 px-5 py-2 rounded-full text-md font-semibold shadow-lg hover:opacity-90 cursor-pointer"
+            >
+              Add Company
             </button>
 
             <Link
               to="/onboarding"
-              className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500"
+              className="bg-red-600 px-8 py-3 rounded-full font-semibold hover:bg-red-500 cursor-pointer text-md"
             >
               Cancel
             </Link>

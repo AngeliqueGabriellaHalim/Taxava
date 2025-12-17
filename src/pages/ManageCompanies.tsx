@@ -138,7 +138,7 @@ rounded-2xl p-4 md:p-5 shadow-lg border border-zinc-800 flex flex-col md:flex-ro
                   <button
                     type="button"
                     onClick={() => handleEdit(company.id)}
-                    className="px-5 py-2 rounded-full bg-[#7C3AED] hover:bg-violet-800/80 text-sm font-semibold shadow-md transition"
+                    className="px-5 py-2 rounded-full bg-[#7C3AED] hover:bg-violet-800/80 text-sm font-semibold shadow-md transition cursor-pointer"
                   >
                     Edit Company
                   </button>
