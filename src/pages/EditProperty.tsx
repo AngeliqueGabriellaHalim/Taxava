@@ -20,7 +20,6 @@ type Property = {
   name: string;
   type: string;
   owner: string;
-  ownerEmail: string;
   returnAddress: string;
   sameAddress: boolean;
   companyId: number;
@@ -31,7 +30,6 @@ type FormState = {
   type: string;
   companyId: string;
   ownerName: string;
-  ownerEmail: string;
   returnAddress: string;
   sameAsCompany: boolean;
   sameAsMailing: boolean;
@@ -79,7 +77,6 @@ const EditProperty: React.FC = () => {
       type: property.type,
       companyId: String(property.companyId),
       ownerName: property.owner,
-      ownerEmail: property.ownerEmail,
       returnAddress: property.returnAddress,
       sameAsCompany: false,
       sameAsMailing: property.sameAddress,
@@ -122,8 +119,8 @@ const EditProperty: React.FC = () => {
         setForm({
           ...form,
           sameAsCompany: checked,
-          ownerName: checked ? selectedCompany.ownerName : form.ownerName,
-          ownerEmail: checked ? selectedCompany.ownerEmail : form.ownerEmail,
+          ownerName: checked ? "Same as Company" : form.ownerName,
+          returnAddress: checked ? "Same as Company" : form.returnAddress,
           error: "",
         });
         return;
@@ -133,7 +130,7 @@ const EditProperty: React.FC = () => {
         setForm({
           ...form,
           sameAsMailing: checked,
-          returnAddress: checked ? mailingAddress : form.returnAddress,
+          returnAddress: checked ? "Same as Company" : form.returnAddress,
           error: "",
         });
       }
@@ -157,7 +154,13 @@ const EditProperty: React.FC = () => {
       return;
     }
 
-    if (!form.name || !form.type) {
+    if (
+      !form.name ||
+      !form.type ||
+      !form.ownerName ||
+      !form.returnAddress ||
+      !form.companyId
+    ) {
       setForm({ ...form, error: "Please fill all required fields" });
       return;
     }
@@ -167,7 +170,6 @@ const EditProperty: React.FC = () => {
       name: form.name,
       type: form.type,
       owner: form.ownerName,
-      ownerEmail: form.ownerEmail,
       returnAddress: form.sameAsMailing ? mailingAddress : form.returnAddress,
       sameAddress: form.sameAsMailing,
       companyId: selectedCompany.id,
