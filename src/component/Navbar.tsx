@@ -1,13 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 
-interface User {
-  id: number;
-  username: string;
-  email: string;
-  password: string;
-  hasOnboarded: boolean;
-}
 const Navbar: React.FC = () => {
   const navigate = useNavigate();
 
@@ -16,7 +9,7 @@ const Navbar: React.FC = () => {
     localStorage.removeItem("currentUser");
     navigate("/login");
   };
-  const handleHome =() =>{
+  const handleHome = () => {
     const user = localStorage.getItem("currentUser");
     if (user) {
       const userObj = JSON.parse(user);
@@ -26,7 +19,7 @@ const Navbar: React.FC = () => {
         navigate("/onboardingdb");
       }
     }
-  }
+  };
 
   return (
     <nav className="w-full bg-zinc-950 border-b border-zinc-800 px-6 py-4 flex items-center justify-between sticky top-0 z-50">

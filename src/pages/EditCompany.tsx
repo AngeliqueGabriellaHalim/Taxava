@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { toast } from "react-toastify";
 import Navbar from "../component/Navbar";
@@ -108,7 +108,7 @@ const EditCompany: React.FC = () => {
     if (!validate() || !formData) return;
 
     const localRaw = localStorage.getItem("companies");
-    let local: Company[] = localRaw ? JSON.parse(localRaw) : [];
+    const local: Company[] = localRaw ? JSON.parse(localRaw) : [];
 
     const idx = local.findIndex((c) => c.id === formData.id);
     if (idx !== -1) {

@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
 import seedUsers from "../db/users.json";
-import { Baseline, Mail, Lock, User } from "lucide-react";
+import { Mail, Lock, User } from "lucide-react";
 
 type LoginMode = "email" | "username";
 
@@ -31,7 +31,7 @@ const LoginPage: React.FC = () => {
         navigate("/onboardingdb");
       }
     }
-  }, []);
+  });
 
   const loadUsers = (): User[] => {
     const data = localStorage.getItem("users");
