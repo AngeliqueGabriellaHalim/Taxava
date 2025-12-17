@@ -26,7 +26,7 @@ const Onboarding: React.FC = () => {
   });
   const [currentStep, setCurrentStep] = useState(0);
 
-   const updateSetupAndStep = useCallback(() => {
+  const updateSetupAndStep = useCallback(() => {
     if (!currentUser) return;
 
     const companies = getCompaniesByUser(currentUser.id);
@@ -51,14 +51,13 @@ const Onboarding: React.FC = () => {
   useEffect(() => {
     const handler = () => updateSetupAndStep();
 
-    setTimeout(handler, 0); 
+    setTimeout(handler, 0);
     window.addEventListener("focus", handler);
 
     return () => {
       window.removeEventListener("focus", handler);
     };
   }, [updateSetupAndStep, location.key]);
-
 
   // Redirect jika tidak login
   if (!currentUser) return <Navigate to="/login" replace />;
@@ -106,9 +105,9 @@ const Onboarding: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white flex flex-col">
+    <div className="min-h-screen  bg-linear-to-r/hsl from-[#191A1F] from-15% to-[#06012F] text-white flex flex-col">
       <Navbar />
-      <div className="min-h-screen bg-neutral-900 text-white px-6 py-10 relative">
+      <div className="min-h-screen bg-linear-to-r/hsl from-[#191A1F] from-15% to-[#06012F] text-white px-6 py-10 relative">
         <p
           onClick={finalizeOnboarding}
           className="absolute top-6 right-8 text-sm underline text-neutral-300 hover:text-white transition cursor-pointer text-right"
@@ -139,7 +138,7 @@ const Onboarding: React.FC = () => {
           ))}
         </div>
 
-        <div className="flex justify-center gap-8 flex-wrap mt-6">
+        <div className="flex justify-center gap-8 flex-wrap mt-6 ">
           {steps.map((step, index) => {
             const isDisabled =
               (index === 1 && currentStep < 1) ||
@@ -177,7 +176,7 @@ const Onboarding: React.FC = () => {
                 <button
                   onClick={() => handleStepAction(index)}
                   disabled={isDisabled}
-                  className={`w-full h-12 rounded-full text-sm font-semibold transition shadow-lg ${
+                  className={`w-full h-12 rounded-full text-sm font-semibold transition cursor-pointer shadow-lg ${
                     isDisabled
                       ? "bg-neutral-600 opacity-40 cursor-not-allowed"
                       : "bg-violet-500 hover:opacity-90 active:scale-95"

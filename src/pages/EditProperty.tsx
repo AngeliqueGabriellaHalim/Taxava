@@ -20,7 +20,6 @@ type Property = {
   name: string;
   type: string;
   owner: string;
-  ownerEmail: string;
   returnAddress: string;
   sameAddress: boolean;
   companyId: number;
@@ -31,7 +30,6 @@ type FormState = {
   type: string;
   companyId: string;
   ownerName: string;
-  ownerEmail: string;
   returnAddress: string;
   sameAsCompany: boolean;
   sameAsMailing: boolean;
@@ -79,7 +77,6 @@ const EditProperty: React.FC = () => {
       type: property.type,
       companyId: String(property.companyId),
       ownerName: property.owner,
-      ownerEmail: property.ownerEmail,
       returnAddress: property.returnAddress,
       sameAsCompany: false,
       sameAsMailing: property.sameAddress,
@@ -122,8 +119,8 @@ const EditProperty: React.FC = () => {
         setForm({
           ...form,
           sameAsCompany: checked,
-          ownerName: checked ? selectedCompany.ownerName : form.ownerName,
-          ownerEmail: checked ? selectedCompany.ownerEmail : form.ownerEmail,
+          ownerName: checked ? "Same as Company" : form.ownerName,
+          returnAddress: checked ? "Same as Company" : form.returnAddress,
           error: "",
         });
         return;
@@ -133,7 +130,7 @@ const EditProperty: React.FC = () => {
         setForm({
           ...form,
           sameAsMailing: checked,
-          returnAddress: checked ? mailingAddress : form.returnAddress,
+          returnAddress: checked ? "Same as Company" : form.returnAddress,
           error: "",
         });
       }
@@ -157,7 +154,13 @@ const EditProperty: React.FC = () => {
       return;
     }
 
-    if (!form.name || !form.type) {
+    if (
+      !form.name ||
+      !form.type ||
+      !form.ownerName ||
+      !form.returnAddress ||
+      !form.companyId
+    ) {
       setForm({ ...form, error: "Please fill all required fields" });
       return;
     }
@@ -167,7 +170,6 @@ const EditProperty: React.FC = () => {
       name: form.name,
       type: form.type,
       owner: form.ownerName,
-      ownerEmail: form.ownerEmail,
       returnAddress: form.sameAsMailing ? mailingAddress : form.returnAddress,
       sameAddress: form.sameAsMailing,
       companyId: selectedCompany.id,
@@ -181,122 +183,125 @@ const EditProperty: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-900 text-white">
+    <div className="min-h-screen bg-linear-to-r/hsl from-[#191A1F] from-15% to-[#06012F] text-white">
       <Navbar />
+      <div className=" text-white px-6 py-14 flex justify-center">
+        <div className="min-h-[60vh] flex justify-center px-4 py-10 bg-neutral-800/50 rounded-2xl shadow-2xl w-full max-w-5xl p-10 relative ">
+          <div className="w-full max-w-4xl">
+            <h1 className="text-4xl font-bold text-center mb-8">
+              Edit Property
+            </h1>
 
-      <div className="flex justify-center px-4 py-10">
-        <div className="w-full max-w-4xl">
-          <h1 className="text-4xl font-bold text-center mb-8">Edit Property</h1>
+            {form.error && (
+              <div className="mb-6 bg-red-700/50 p-3  text-md text-white px-4 py-3 rounded-xl">
+                {form.error}
+              </div>
+            )}
 
-          {form.error && (
-            <div className="mb-6 bg-zinc-800 text-red-300 px-4 py-3 rounded-xl">
-              {form.error}
-            </div>
-          )}
+            <form onSubmit={handleSubmit} className="space-y-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* LEFT */}
+                <div className="space-y-4">
+                  <input
+                    type="text"
+                    placeholder="Property name"
+                    value={form.name}
+                    onChange={handleChange("name")}
+                    className="w-full bg-zinc-800 p-3 rounded-xl"
+                  />
 
-          <form onSubmit={handleSubmit} className="space-y-8">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* LEFT */}
-              <div className="space-y-4">
-                <input
-                  type="text"
-                  placeholder="Property name"
-                  value={form.name}
-                  onChange={handleChange("name")}
-                  className="w-full bg-zinc-800 p-3 rounded-xl"
-                />
-
-                <div className="relative">
-                  <select
-                    value={form.type}
-                    onChange={handleChange("type")}
-                    className="w-full bg-zinc-800 p-3 rounded-xl appearance-none"
-                  >
-                    <option value="" disabled>
-                      Select property type
-                    </option>
-                    {propertyTypes.map((t) => (
-                      <option key={t} value={t}>
-                        {t}
+                  <div className="relative">
+                    <select
+                      value={form.type}
+                      onChange={handleChange("type")}
+                      className="w-full bg-zinc-800 p-3 rounded-xl appearance-none"
+                    >
+                      <option value="" disabled>
+                        Select property type
                       </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                      {propertyTypes.map((t) => (
+                        <option key={t} value={t}>
+                          {t}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                  </div>
+
+                  <div className="relative">
+                    <select
+                      value={form.companyId}
+                      onChange={handleCompanyChange}
+                      className="w-full bg-zinc-800 p-3 rounded-xl appearance-none"
+                    >
+                      <option value="" disabled>
+                        Select company
+                      </option>
+                      {userCompanies.map((c) => (
+                        <option key={c.id} value={c.id}>
+                          {c.name}
+                        </option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                  </div>
                 </div>
 
-                <div className="relative">
-                  <select
-                    value={form.companyId}
-                    onChange={handleCompanyChange}
-                    className="w-full bg-zinc-800 p-3 rounded-xl appearance-none"
-                  >
-                    <option value="" disabled>
-                      Select company
-                    </option>
-                    {userCompanies.map((c) => (
-                      <option key={c.id} value={c.id}>
-                        {c.name}
-                      </option>
-                    ))}
-                  </select>
-                  <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400" />
+                {/* RIGHT */}
+                <div className="space-y-4">
+                  <label className="flex gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={form.sameAsCompany}
+                      onChange={handleCheckbox("sameAsCompany")}
+                    />
+                    Same as company owner
+                  </label>
+
+                  <input
+                    type="text"
+                    value={form.ownerName}
+                    disabled={form.sameAsCompany}
+                    onChange={handleChange("ownerName")}
+                    className="w-full bg-zinc-800 p-3 rounded-xl disabled:bg-zinc-700"
+                  />
+
+                  <input
+                    type="text"
+                    value={form.returnAddress}
+                    disabled={form.sameAsMailing}
+                    onChange={handleChange("returnAddress")}
+                    className="w-full bg-zinc-800 p-3 rounded-xl disabled:bg-zinc-700"
+                  />
+
+                  <label className="flex gap-2 text-sm">
+                    <input
+                      type="checkbox"
+                      checked={form.sameAsMailing}
+                      onChange={handleCheckbox("sameAsMailing")}
+                    />
+                    Same as mailing address
+                  </label>
                 </div>
               </div>
 
-              {/* RIGHT */}
-              <div className="space-y-4">
-                <label className="flex gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={form.sameAsCompany}
-                    onChange={handleCheckbox("sameAsCompany")}
-                  />
-                  Same as company owner
-                </label>
-
-                <input
-                  type="text"
-                  value={form.ownerName}
-                  disabled={form.sameAsCompany}
-                  onChange={handleChange("ownerName")}
-                  className="w-full bg-zinc-800 p-3 rounded-xl disabled:bg-zinc-700"
-                />
-
-                <input
-                  type="text"
-                  value={form.returnAddress}
-                  disabled={form.sameAsMailing}
-                  onChange={handleChange("returnAddress")}
-                  className="w-full bg-zinc-800 p-3 rounded-xl disabled:bg-zinc-700"
-                />
-
-                <label className="flex gap-2 text-sm">
-                  <input
-                    type="checkbox"
-                    checked={form.sameAsMailing}
-                    onChange={handleCheckbox("sameAsMailing")}
-                  />
-                  Same as mailing address
-                </label>
+              <div className="flex justify-center gap-6">
+                <button
+                  type="submit"
+                  className="cursor-pointer px-10 py-3 rounded-full bg-indigo-500 font-semibold"
+                >
+                  Save
+                </button>
+                <button
+                  type="button"
+                  onClick={() => navigate("/manage-properties")}
+                  className=" cursor-pointer px-10 py-3 rounded-full bg-red-500 font-semibold"
+                >
+                  Cancel
+                </button>
               </div>
-            </div>
-
-            <div className="flex justify-center gap-6">
-              <button
-                type="submit"
-                className="px-10 py-3 rounded-full bg-indigo-500 font-semibold"
-              >
-                Save
-              </button>
-              <button
-                type="button"
-                onClick={() => navigate("/manage-properties")}
-                className="px-10 py-3 rounded-full bg-red-500 font-semibold"
-              >
-                Cancel
-              </button>
-            </div>
-          </form>
+            </form>
+          </div>
         </div>
       </div>
     </div>
